@@ -1,0 +1,32 @@
+<p>Greetings {{user.name}},<p>
+
+<p>You can manage your notifications by emailing Ansible. The email must have the word 'manage' in the subject.
+You may add a command on each line. Each part of a command should be separated by a space and there should be no more than 1 command per line.</p>
+
+<p>Here's a list (with examples) of all available commands</p>
+
+<p>set &lt;day&gt; &lt;time&gt;: sets the email time for a specific day<br />
+The command to set an email notification for 9:00am on Monday is: <br />
+set Mon 9 <br />
+The command to set an email notification for 3:00pm on Friday is: <br />
+set Fri 15</p>
+
+<p>remove &lt;day&gt;: removes the email time so you don't receive any more notifications on the specified day<br />
+The command to remove emails on Thursday is:<br />
+remove Thu</p>
+
+<p>adduser &lt;name&gt; &lt;email&gt;: adds a user to the system. Only admins can do this.<br />
+The command to add a user named Bob to the system is:<br />
+adduser Bob bob@bob.bob</p>
+
+<p>removeuser &lt;name&gt;: removes a user from the system. Only admins can do this.<br />
+The command to remove a user named Bob from the system is:<br />
+removeuser Bob</p>
+
+<p>admin &lt;user&gt; &lt;privilege&gt;: Grants or rescinds admin privileges to a user. Only admins can do this.<br />
+The command to give admin privileges to a user is:<br />
+admin Bob 1<br />
+The commmand to rescind admin privileges is:<br />
+admin Bob 0</p>
+
+<p>-Teachboost Ansible</p>

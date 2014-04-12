@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Reporting Test</title>
+</head>
+<body>
+    <form action="report" method="POST">
+        <label for="from">From</label>
+        <input name="from" />
+        <label for="subject">Subject</label>
+        <input name="subject" />
+        <label for="body">Body</label>
+        <textarea cols="80" rows="20" name="body"></textarea>
+        <input type='hidden' name="key" value="{{key}}" />
+        <input type='hidden' name="debug" value="1" />
+        <button type="submit">Send "email"</button>
+    </form>
+</body>
+</html>

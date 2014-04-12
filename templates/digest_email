@@ -1,0 +1,21 @@
+<p>Greetings {{name}},</p>
+
+This is your summary of completed tasks from {{start}} to {{end}}.
+% for usertasks in tasklist:
+    <h3>{{usertasks['user']}}</h3>
+    % for datetasks in usertasks['dates']:
+        {{datetasks['date']}}
+        <ul>
+        % for task in datetasks['tasks']:
+            <li>{{task.description}}</li>
+        % end
+        </ul>
+    % end
+% end
+
+
+<p>This email was created on {{date}}.</p>
+
+<p>For additional information send an email with 'help' in the subject to {{sender}}.</p>
+
+<p>-Teachboost Ansible</p>
