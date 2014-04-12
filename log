@@ -1,4 +1,0 @@
-2014-04-11 20:03:00,915 ERROR    Failed to send email to Josh
-2014-04-11 20:03:00,915 ERROR    list index out of range
-2014-04-11 20:05:21,493 ERROR    Failed to send email to Josh
-2014-04-11 20:05:21,494 ERROR    object of type 'SelectQuery' has no len()
