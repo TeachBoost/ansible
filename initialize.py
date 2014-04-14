@@ -1,7 +1,9 @@
+#! /usr/bin/python
+
 ''' Initalization script. Should only be run once. '''
 
 import os
-from datetime import datetime
+from datetime import timedelta
 
 from model import User, Task
 import settings
@@ -14,7 +16,8 @@ DEFAULT_TIMES = {
 }
 
 def delete_db(db_file):
-    os.remove(db_file)
+    if os.path.isfile(db_file):
+        os.remove(db_file)
 
 def create_tables():
     User.create_table()
@@ -29,8 +32,16 @@ def populate():
     User.create(name="Mike", email="mike@teachboost.com", **DEFAULT_TIMES)
     User.create(name="Peter", email="peter@teachboost.com", **DEFAULT_TIMES)
 
+def modify_for_debug():
+    josh = User.get(name="Josh")
+    josh.created -= timedelta(1)
+    josh.is_admin = True
+    josh.save()
+
 
 if __name__ == "__main__":
     delete_db(settings.DATABASE)
     create_tables()
     populate()
+    if settings.DEBUG:
+        modify_for_debug()

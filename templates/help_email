@@ -5,7 +5,7 @@ You may add a command on each line. Each part of a command should be separated b
 
 <p>Here's a list (with examples) of all available commands</p>
 
-<p>set &lt;day&gt; &lt;time&gt;: sets the email time for a specific day<br />
+<p>set &lt;day&gt; &lt;time&gt;: sets the email time (24hr time) for a specific day<br />
 The command to set an email notification for 9:00am on Monday is: <br />
 set Mon 9 <br />
 The command to set an email notification for 3:00pm on Friday is: <br />

@@ -29,11 +29,19 @@ class User(Model):
         send_hour = getattr(self, date.strftime("%a"))
         last_sent = self.last_sent or self.created
         return all([
+            self.is_active,
             send_hour >= 0,
             send_hour <= date.hour,
             (last_sent.day != date.day or last_sent.hour < send_hour),
-            self.name == 'Josh'
         ])
+
+    def update_last_sent(self, time):
+        '''
+        Updates the last_sent property of a user
+        time = the time to save as last_sent
+        '''
+        self.last_sent = time
+        self.save()
 
 
 class Task(Model):

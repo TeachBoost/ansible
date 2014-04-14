@@ -13,6 +13,7 @@ ARGUMENT = 2
 
 class Manager(object):
 
+    # both
     def __init__(self):
         '''
         Creates an Ansible manager.
@@ -21,10 +22,117 @@ class Manager(object):
             load templates
         '''
 
+        # both
         self.mail_client = MailClient()
+
+
+    # both
+    def get_template(self, filename):
+        '''
+        Loads a template from the specified filename
+        filename = The name of the file to load as a template
+        '''
+
+        input_file = open(filename)
+        data = input_file.read()
+        input_file.close()
+        return SimpleTemplate(data)
+
+
+class CronManager(Manager):
+
+    def __init__(self):
+        super(CronManager, self).__init__()
+        self.digest_template = self.get_template(settings.Templates.DIGEST_EMAIL)
+
+    def format_tasks(self, tasks):
+        '''
+        Converts tasks to a nested structure for use in the digest template
+        tasks = A Peewee Task query
+        '''
+
+        tasks = [task for task in tasks] 
+        user = tasks[0].user.name
+        date = tasks[0].date.strftime('%d/%m/%Y')
+
+        userlist = []
+        userdict = {'user': user, 'dates': []}
+        datedict = {'date': date}
+        tasklist = []
+
+        for task in tasks:
+            taskdate = task.date.strftime("%d/%m/%Y")
+            if taskdate != date or task.user.name != user:
+                datedict['tasks'] = tasklist
+                userdict['dates'].append(datedict)
+
+                date = taskdate
+                datedict = {'date': date}
+                tasklist = []
+
+            if task.user.name != user:
+                userlist.append(userdict)
+                user = task.user.name
+                userdict = {'user': user, 'dates': []}
+
+            tasklist.append(task)
+
+        datedict['tasks'] = tasklist
+        userdict['dates'].append(datedict)
+        userlist.append(userdict)
+        return userlist
+
+    def get_message_vars(self, user, now):
+        '''
+        Prepares a dict of variables to use in the digest template
+        user = A User from the User table
+        now = a datetime object representing the current time
+        '''
+
+        last_sent = user.last_sent or user.created
+        tasks = Task.select().where((Task.date>last_sent))\
+            .order_by(Task.user.name, Task.date)
+        tasks = [task for task in tasks]
+        print "Found {0} tasks".format(len(tasks))
+
+        return {
+            'name': user.name,
+            'start': last_sent.strftime("%B %d, %Y"),
+            'end': now.strftime("%B %d, %Y"),
+            'tasklist': self.format_tasks(tasks),
+            'date': now.strftime("%B %d, %Y at %I:%M:%S %p"),
+            'sender': settings.SENDER,
+        }
+
+    def create_digest(self, users):
+        '''
+        Creates a digest email for all users if:
+            The user is due to recieve a digest
+            There are tasks to report
+        users = A Peewee User query
+        '''
+
+        print "Running cron"
+        now = datetime.now()
+        for user in ifilter(lambda user: user.is_due(now), users):
+            print "Creating digest for {0}".format(user.name)
+            try:
+                vars = self.get_message_vars(user, now)
+                if vars:
+                    body = self.digest_template.render(**vars)
+                    self.mail_client.send(user, body, Subjects.DIGEST)
+                user.update_last_sent(now)
+            except Exception as e:
+                logging.error("Failed to send email to {0}".format(user.name))
+                logging.error(e)
+
+
+class ServerManager(Manager):
+
+    def __init__(self):
+        super(ServerManager, self).__init__()
         self.help_template = self.get_template(settings.Templates.HELP_EMAIL)
         self.response_template = self.get_template(settings.Templates.RESPONSE_EMAIL)
-        self.digest_template = self.get_template(settings.Templates.DIGEST_EMAIL)
 
     def add_task(self, user, body):
         '''
@@ -91,7 +199,7 @@ class Manager(object):
                     continue
 
                 setattr(user, day, hour)
-                response = 'We will email you at {0} on {1}.'.format(hour, day) if hour\
+                response = 'We will email you at {0}:00 on {1}.'.format(hour, day) if hour\
                     else 'We will no longer email you on {0}.'.format(day)
                 responses.append(response)
                 save_user = True
@@ -176,107 +284,3 @@ class Manager(object):
         admin.is_admin = privilege
         admin.save()
         return "Set {0}'s admin status to {1}".format(admin.name, privilege)
-
-    def format_tasks(self, tasks):
-        '''
-        Converts tasks to a nested structure for use in the digest template
-        tasks = A Peewee Task query
-        '''
-
-        tasks = [task for task in tasks] 
-        user = tasks[0].user.name
-        date = tasks[0].date.strftime('%d/%m/%Y')
-
-        userlist = []
-        userdict = {'user': user, 'dates': []}
-        datedict = {'date': date}
-        tasklist = []
-
-        for task in tasks:
-            taskdate = task.date.strftime("%d/%m/%Y")
-            if taskdate != date or task.user.name != user:
-                datedict['tasks'] = tasklist
-                userdict['dates'].append(datedict)
-
-                date = taskdate
-                datedict = {'date': date}
-                tasklist = []
-
-            if task.user.name != user:
-                userlist.append(userdict)
-                user = task.user.name
-                userdict = {'user': user, 'dates': []}
-
-            tasklist.append(task)
-
-        datedict['tasks'] = tasklist
-        userdict['dates'].append(datedict)
-        userlist.append(userdict)
-        return userlist
-
-    def get_message_vars(self, user, now):
-        '''
-        Prepares a dict of variables to use in the digest template
-        user = A User from the User table
-        now = a datetime object representing the current time
-        '''
-
-        last_sent = user.last_sent or user.created
-        tasks = Task.select().where((Task.date>last_sent))\
-            .order_by(Task.user.name, Task.date)
-        tasks = [task for task in tasks]
-
-        if not len(tasks):
-            print 'no tasks'
-            return
-
-        return {
-            'name': user.name,
-            'start': last_sent.strftime("%B %d, %Y"),
-            'end': now.strftime("%B %d, %Y"),
-            'tasklist': self.format_tasks(tasks),
-            'date': now.strftime("%B %d, %Y at %I:%M:%S %p"),
-            'sender': settings.SENDER,
-        }
-
-    def update_user_last_sent(self, user, now):
-        '''
-        Updates the last_sent property of a user
-        user = A User object from the User table
-        now = the time to save as last_sent
-        '''
-
-        user.last_sent = now
-        user.save()
-
-    def create_digest(self, users):
-        '''
-        Creates a digest email for all users if:
-            The user is due to recieve a digest
-            There are tasks to report
-        users = A Peewee User query
-        '''
-
-        now = datetime.now()
-        for user in ifilter(lambda user: user.is_due(now), users):
-            print "Creating digest for {0}".format(user.name)
-            try:
-                vars = self.get_message_vars(user, now)
-                if vars:
-                    body = self.digest_template.render(**vars)
-                    self.mail_client.send(user, body, Subjects.DIGEST)
-                self.update_user_last_sent(user, now)
-            except Exception as e:
-                logging.error("Failed to send email to {0}".format(user.name))
-                logging.error(e)
-
-    def get_template(self, filename):
-        '''
-        Loads a template from the specified filename
-        filename = The name of the file to load as a template
-        '''
-
-        input_file = open(filename)
-        data = input_file.read()
-        input_file.close()
-        return SimpleTemplate(data)

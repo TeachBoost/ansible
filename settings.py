@@ -1,10 +1,12 @@
-from os import path
 import logging
+from os import path
 
 ''' The following values will need to be configured to work with the local system '''
 
-# Enable debugging in Bottle and print emails instead of sending them
-DEBUG = True
+# The address of the sender. Also the sending address for the smtp server
+SENDER = ''
+# Password for logging into smtp serever
+PASSWORD = ""
 
 # Details about the smtp server
 SMTP = {
@@ -12,9 +14,10 @@ SMTP = {
     'port': 587,
 }
 
-# The address of the sender. Also the sending address for the smtp server
-SENDER = '' # Ad the senders address. ex: 'me@mysite.com'
-PASSWORD = '' # The sender's password 
+# Enable debugging
+DEBUG = True
+# Enable email sending
+SEND_EMAIL = False
 
 # Authentication key. Used to validate incoming emails
 # Change this value before using in production
@@ -30,7 +33,8 @@ SERVER = {
 # The name of the database file
 DATABASE = 'ansible.db'
 
-''' The rest of the values don't need to be modified, but still can be if that's desired '''
+
+''' The rest of the values don't need to be modified, but still can be... '''
 
 # The location of templates
 TEMPLATE_DIR = 'templates/'

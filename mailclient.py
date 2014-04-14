@@ -13,7 +13,9 @@ class MailClient(object):
 
         self.client = smtplib.SMTP(**settings.SMTP)
         self.sender = settings.SENDER
+        self.client.ehlo()
         self.client.starttls()
+        self.client.ehlo()
         self.client.login(self.sender, settings.PASSWORD)
 
     def send(self, recipient, body, subject):
@@ -32,11 +34,10 @@ class MailClient(object):
         email['Subject'] = subject
         email.attach(MIMEText(body, 'html'))
 
-        if settings.DEBUG:
-            print email.as_string()
-        else:
-            print "sending"
+        if settings.SEND_EMAIL:
             self.client.sendmail(self.sender, recipient.email, email.as_string())
+        else:
+            print email.as_string()
 
 
 class Subjects:
