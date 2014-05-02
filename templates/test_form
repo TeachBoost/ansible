@@ -4,14 +4,13 @@
     <title>Task Reporting Test</title>
 </head>
 <body>
-    <form action="" method="POST">
+    <form action="{{public_url}}?key={{key}}" method="POST">
         <label for="Sender">From</label>
         <input name="Sender" />
         <label for="Subject">Subject</label>
         <input name="Subject" />
         <label for="stripped-text">Body</label>
         <textarea cols="80" rows="20" name="stripped-text"></textarea>
-        <input type='hidden' name="key" value="{{key}}" />
         <button type="submit">Send "email"</button>
     </form>
 </body>

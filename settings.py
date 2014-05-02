@@ -5,6 +5,8 @@ import credentials
 
 ''' The following values will need to be configured to work with the local system '''
 
+PUBLIC_URL = 'ansible'
+
 # Details about the smtp server
 SMTP = {
     'host': 'smtp.mailgun.org',
