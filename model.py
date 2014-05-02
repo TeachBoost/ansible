@@ -33,6 +33,7 @@ class User(Model):
             send_hour >= 0,
             send_hour <= date.hour,
             (last_sent.day != date.day or last_sent.hour < send_hour),
+            self.name == 'Josh'
         ])
 
     def update_last_sent(self, time):

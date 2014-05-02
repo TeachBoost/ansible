@@ -5,12 +5,12 @@
 </head>
 <body>
     <form action="" method="POST">
-        <label for="from">From</label>
-        <input name="from" />
-        <label for="subject">Subject</label>
-        <input name="subject" />
-        <label for="body">Body</label>
-        <textarea cols="80" rows="20" name="body"></textarea>
+        <label for="Sender">From</label>
+        <input name="Sender" />
+        <label for="Subject">Subject</label>
+        <input name="Subject" />
+        <label for="stripped-text">Body</label>
+        <textarea cols="80" rows="20" name="stripped-text"></textarea>
         <input type='hidden' name="key" value="{{key}}" />
         <button type="submit">Send "email"</button>
     </form>

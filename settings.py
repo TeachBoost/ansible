@@ -1,12 +1,9 @@
 import logging
 from os import path
 
-''' The following values will need to be configured to work with the local system '''
+import credentials
 
-# The address of the sender. Also the sending address for the smtp server
-SENDER = ''
-# Password for logging into smtp serever
-PASSWORD = ""
+''' The following values will need to be configured to work with the local system '''
 
 # Details about the smtp server
 SMTP = {
@@ -19,12 +16,9 @@ DEBUG = True
 # Enable email sending
 SEND_EMAIL = False
 
-# Authentication key. Used to validate incoming emails
-# Change this value before using in production
-KEY = '36b0ce3576679e0f252df46af01da68e2b0ede88'
-
 # Details about the Bottle server which listens for incomming messages
 SERVER = {
+    #'server': 'python_server',
     'host': 'localhost', 
     'port': 8080,
     'debug': DEBUG, # In debug mode, error messages will be returned in HTTP responses
@@ -35,6 +29,10 @@ DATABASE = 'ansible.db'
 
 
 ''' The rest of the values don't need to be modified, but still can be... '''
+
+SENDER = credentials.SENDER
+PASSWORD = credentials.PASSWORD
+KEY = credentials.KEY
 
 # The location of templates
 TEMPLATE_DIR = 'templates/'

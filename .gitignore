@@ -3,3 +3,5 @@
 .pydevproject
 log
 ansible.db
+credentials.py
+
