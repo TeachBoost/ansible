@@ -17,6 +17,7 @@ DEBUG = True
 SEND_EMAIL = False
 
 # Details about the Bottle server which listens for incomming messages
+# Only used when running from terminal. Configure nginx server separately.
 SERVER = {
     #'server': 'python_server',
     'host': 'localhost', 

@@ -14,23 +14,23 @@ HELP_REGEX = re.compile("help")
 MANAGE_REGEX = re.compile("manage")
 
 manager = ServerManager()
-app = bottle.Bottle()
+app = application = bottle.Bottle()
 
 @app.post('/')
 def report():
     if bottle.request.forms.get('key') != settings.KEY:
         raise Exception("Not Signed")
-    
+
     sender = bottle.request.forms.get('Sender')
     try:
         user = User.get(email=sender)
     except User.DoesNotExist:
         logging.error("Invalid User: {0}".format(sender))
-        return
+        return "Invalid User"
 
     if not user.is_active:
         logging.error("Inactive User: {0}".format(sender))
-        return
+        return "Inactive User"
 
     subject = bottle.request.forms.get('Subject')
 
@@ -55,7 +55,6 @@ def showform():
     if settings.DEBUG:
         return manager.get_template(settings.Templates.TEST_FORM).render(key=settings.KEY)
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
 #    bottle.run(app=)
-bottle.run(app=app, **settings.SERVER)
-
+    bottle.run(app=app, **settings.SERVER)

@@ -1,0 +1,19 @@
+upstream ansible {
+    server unix:/run/uwsgi/app/ansible/socket;
+}
+
+server {
+    listen [::]:80;
+    listen 80;
+    server_name localhost;
+    root /var/www/ansible;
+
+    location / {
+        try_files $uri @uwsgi;
+    }
+
+    location @uwsgi {
+        include uwsgi_params;
+        uwsgi_pass ansible;
+    }
+}
