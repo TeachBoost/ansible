@@ -1,6 +1,7 @@
 import logging
 from itertools import ifilter
 from datetime import datetime
+from calendar import day_abbr as DAYS
 
 from bottle import SimpleTemplate
 import settings
@@ -13,7 +14,6 @@ ARGUMENT = 2
 
 class Manager(object):
 
-    # both
     def __init__(self):
         '''
         Creates an Ansible manager.
@@ -22,11 +22,9 @@ class Manager(object):
             load templates
         '''
 
-        # both
         self.mail_client = MailClient()
 
 
-    # both
     def get_template(self, filename):
         '''
         Loads a template from the specified filename
@@ -127,6 +125,61 @@ class CronManager(Manager):
                 logging.error(e)
 
 
+class AdminManager(Manager):
+    def __init__(self):
+        super(AdminManager, self).__init__()
+        self.all_template = self.get_template(settings.Templates.ADMIN)
+        self.user_template = self.get_template(settings.Templates.USER)
+
+    def create(self, name, email):
+        '''
+        Adds a user to the user table
+        email = the user's email
+        name = the user's name
+        '''
+
+        try:
+            user = User.get(email=email)
+            user.name = name
+            user.is_active = True
+            user.save()
+        except User.DoesNotExist:
+            User.create(name=name, email=email)
+        return "Added user '{0}' with email '{1}'".format(name, email)
+
+    def remove(self, id):
+        ''' 
+        Marks a user as inactive.
+        Inactive users cannot report tasks or receieve emails
+        email = the user's email
+        '''
+
+        try:
+            leaving = User.get(id=id)
+            leaving.is_active = False
+            leaving.save()
+            message = "Removed user '{0}' with email '{1}'".format(leaving.name, leaving.email)
+        except (User.DoesNotExist, ValueError):
+            message = "No user with id '{0}'".format(id)
+        return message
+
+    def update(self, id, schedule):
+        try:
+            user = User.get(id=id)
+        except (User.DoesNotExist, ValueError):
+            return
+        for day in DAYS:
+            time = schedule.get(day)
+            try:
+                time = int(time)
+                if time < 0 or time >= 24:
+                    time = None
+            except:
+                time = None
+            setattr(user, day, time)
+        user.save()
+
+
 class ServerManager(Manager):
 
     def __init__(self):
@@ -153,7 +206,6 @@ class ServerManager(Manager):
             Each line will be interpreted as a separate command
         '''
 
-        save_user = False
         responses = []
         for command in map(lambda x: x.split(), body.split('\n')):
             if not len(command):
@@ -161,64 +213,43 @@ class ServerManager(Manager):
 
             directive = command[DIRECTIVE].lower()
 
-            # Is the command recognized at all
-            if directive not in ['set', 'remove', 'adduser', 'removeuser', 'admin']:
+            # Is the command recognized
+            if directive not in ['set', 'remove']:
                 responses.append("Unrecognized command: {0}".format(' '.join(command)))
                 continue
 
             # Does the command have the proper number of arguments
-            if (directive in ['set', 'adduser', 'admin'] and len(command) < 3 )\
-            or directive in ['remove', 'removeuser'] and len(command) < 2:
+            if (directive in ['set'] and len(command) < 3 )\
+            or (directive in ['remove'] and len(command) < 2):
                 responses.append("Missing argument: {0}".format(' '.join(command)))
                 continue
 
-            # If the command is admin restricted, is the user an admin
-            if directive not in ['set', 'remove'] and not user.is_admin:
-                responses.append("Only admins can execute: {0}".format(directive))
+            day = command[OPERAND][:3].capitalize()
+
+            # Is the day valid
+            if (not hasattr(user, day)):
+                responses.append("Invalid day: {0}".format(' '.join(command)))
                 continue
 
-            # Set the email time for a specific day
-            if directive == 'set' or directive == 'remove':
-                day = command[OPERAND][:3].capitalize()
+            # Is the hour a number. Not necessary for remove
+            try:
+                hour = int(command[ARGUMENT]) if directive == 'set' else None
+            except:
+                responses.append("Invalid time: {0}".format(' '.join(command)))
+                continue
 
-                # Is the day valid
-                if (not hasattr(user, day)):
-                    responses.append("Invalid day: {0}".format(' '.join(command)))
-                    continue
+            # Is the hour either None (for remove) or between 0 and 23 (for set)
+            if not hour is None and any([hour < 0, hour > 23]):
+                responses.append("Invalid arguments: {0}".format(' '.join(command)))
+                continue
 
-                # Is the hour a number. Not necessary for remove
-                try:
-                    hour = int(command[ARGUMENT]) if directive == 'set' else None
-                except:
-                    responses.append("Invalid time: {0}".format(' '.join(command)))
-                    continue
+            # Make the modification & add the appropriate response
+            setattr(user, day, hour)
+            response = 'We will email you at {0}:00 on {1}.'.format(hour, day) if hour\
+                else 'We will no longer email you on {0}.'.format(day)
+            responses.append(response)
 
-                # Is the hour either None (for remove) or between 0 and 23 (for set)
-                if not hour is None and any([hour < 0, hour > 23]):
-                    responses.append("Invalid arguments: {0}".format(' '.join(command)))
-                    continue
-
-                setattr(user, day, hour)
-                response = 'We will email you at {0}:00 on {1}.'.format(hour, day) if hour\
-                    else 'We will no longer email you on {0}.'.format(day)
-                responses.append(response)
-                save_user = True
-
-            # Add a new user
-            elif directive == 'newuser' or directive == 'adduser':
-                responses.append(self.add_user(command, user))
-
-            # Remove a user
-            elif directive == 'removeuser':
-                responses.append(self.remove_user(command, user))
-
-            # Grant/rescind admin to a user
-            elif directive == 'admin':
-                responses.append(self.admin(command, user))
-
-        if save_user:
-            user.save()
-
+        user.save()
         body = self.response_template.render(responses=responses, user=user, sender=settings.SENDER)
         self.mail_client.send(user, body, Subjects.RESPONSE)
         return body
@@ -232,55 +263,3 @@ class ServerManager(Manager):
         body = self.help_template.render(user=user)
         self.mail_client.send(user, body, Subjects.HELP)
         return body
-
-    def add_user(self, command, user):
-        '''
-        Adds a user to the user table
-        command = a command array containing:
-            the user's name as the OPERAND
-            the user's email as the ARGUMENT
-        user = The user attempthing the operation. Must be admin
-        '''
-
-        name = command[OPERAND]
-        email = command[ARGUMENT]
-        try:
-            user = User.get(name=name)
-            user.email = email
-            user.is_active = True
-            user.save()
-        except User.DoesNotExist:
-            User.create(name=name, email=email)
-        return "Added user {0}".format(name)
-
-    def remove_user(self, command, user):
-        ''' 
-        Marks a user as inactive.
-        Inactive users cannot report tasks or receieve emails
-        command = a command array containing:
-            the user's name as the OPERAND
-        '''
-
-        name = command[OPERAND]
-        try:
-            leaving = User.get(name=name)
-            leaving.is_active = False
-            leaving.save()
-            message = "Removed user {0}".format(leaving.name)
-        except User.DoesNotExist:
-            message = "No user named {0}".format(name)
-        return message
-
-    def admin(self, command, user):
-        '''
-        Grant or rescind admin privileges to a user
-        command = a command array containing:
-            the user's name as the OPERAND
-            a boolean value for the ARGUMENT (True to grand, False to rescind)
-        '''
-
-        admin = User.get(name = command[OPERAND])
-        privilege = command[ARGUMENT].lower() in ['t', 'true', '1']
-        admin.is_admin = privilege
-        admin.save()
-        return "Set {0}'s admin status to {1}".format(admin.name, privilege)

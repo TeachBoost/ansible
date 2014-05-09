@@ -1,22 +1,25 @@
 #! /usr/bin/python
-
 import re
 import logging
+from itertools import ifilter
 
 import bottle
-#from bottle import run, post, request, get
+
 import settings
 from model import User
-from manager import ServerManager
+from manager import ServerManager, AdminManager
 
-TEMPLATE = 'template'
 HELP_REGEX = re.compile("help")
 MANAGE_REGEX = re.compile("manage")
 
 manager = ServerManager()
-app = application = bottle.Bottle()
+admin_manager = AdminManager()
 
-@app.post('/'+settings.PUBLIC_URL)
+app = application = bottle.Bottle()
+ansible = bottle.Bottle()
+app.mount(settings.PUBLIC_URL, ansible)
+
+@app.post(settings.PUBLIC_URL + '/email')
 def report():
     if bottle.request.query.get('key') != settings.KEY:
         raise Exception("Not Signed")
@@ -49,12 +52,44 @@ def report():
     if settings.DEBUG and response:
         return response
 
-
-@app.get('/'+settings.PUBLIC_URL)
+@app.get(settings.PUBLIC_URL + '/email')
 def showform():
     if settings.DEBUG:
-        return manager.get_template(settings.Templates.TEST_FORM).render(key=settings.KEY, public_url=settings.PUBLIC_URL)
+        template = manager.get_template(settings.Templates.TEST_FORM)
+        template_vars = {'key': settings.KEY, 'public_url': settings.PUBLIC_URL}
+        return template.render(**template_vars)
+
+@ansible.get('/admin/<id>')
+def user_admin(id):
+    try:
+        user = User.get(id=id)
+    except:
+        return bottle.redirect(settings.PUBLIC_URL+ '/admin')
+    return admin_manager.user_template.render(user=user, home=settings.PUBLIC_URL)
+
+@ansible.post('/admin/<id>')
+def user_update(id):
+    admin_manager.update(id, bottle.request.forms)
+    return user_admin(id)
+
+@ansible.get('/admin')
+def all_admin():
+    users = User.select().where(User.is_active==True)
+    response = admin_manager.all_template.render(users=users)
+    return response
+
+@ansible.post('/admin/delete')
+def admin_delete():
+    inputs = bottle.request.forms
+    ids = ifilter(lambda field: inputs[field], inputs)
+    [admin_manager.remove(user_id) for user_id in ids]
+    return bottle.redirect(settings.PUBLIC_URL + '/admin')
+
+@ansible.post('/admin/add')
+def admin_add():
+    inputs = bottle.request.forms
+    admin_manager.create(inputs.get('name'), inputs.get('email'))
+    return bottle.redirect(settings.PUBLIC_URL + '/admin')
 
 if __name__ == '__main__':
-#    bottle.run(app=)
     bottle.run(app=app, **settings.SERVER)

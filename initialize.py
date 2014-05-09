@@ -3,45 +3,37 @@
 ''' Initalization script. Should only be run once. '''
 
 import os
+import sys
 from datetime import timedelta
 
 from model import User, Task
 import settings
 
-
-DEFAULT_TIMES = {
-    'Mon': 9,
-    'Thu': 10,
-    'Fri': 8,
-}
-
-def delete_db(db_file):
+def delete_db(db_file, force):
     if os.path.isfile(db_file):
-        os.remove(db_file)
+        if force:
+            os.remove(db_file)
+        else:
+            return True
 
 def create_tables():
     User.create_table()
     Task.create_table()
 
 def populate():
-    User.create(name="Andrew", email="andrew@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Jason", email="jason@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Jill", email="jill@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Josh", email="josh@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Kate", email="kate@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Mike", email="mike@teachboost.com", **DEFAULT_TIMES)
-    User.create(name="Peter", email="peter@teachboost.com", **DEFAULT_TIMES)
-
-def modify_for_debug():
-    josh = User.get(name="Josh")
-    josh.created -= timedelta(1)
-    josh.is_admin = True
-    josh.save()
-
+    User.create(name="Andrew", email="andrew@teachboost.com")
+    User.create(name="Jason", email="jason@teachboost.com")
+    User.create(name="Jill", email="jill@teachboost.com")
+    User.create(name="Josh", email="josh@teachboost.com")
+    User.create(name="Kate", email="kate@teachboost.com")
+    User.create(name="Mike", email="mike@teachboost.com")
+    User.create(name="Peter", email="peter@teachboost.com")
 
 if __name__ == "__main__":
-    delete_db(settings.DATABASE)
-    create_tables()
-    populate()
-    if settings.DEBUG:
-        modify_for_debug()
+    force = '-f' in sys.argv
+    exists = delete_db(settings.DATABASE, force)
+    if exists:
+        print "A database already exists. Run with -f to delete and reinitialize"
+    else:
+        create_tables()
+        populate()

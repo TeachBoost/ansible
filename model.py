@@ -23,7 +23,6 @@ class User(Model):
     Sun = IntegerField(null=True)
     created = DateTimeField(default=datetime.now)
     is_active = BooleanField(default=True)
-    is_admin = BooleanField(default=False)
 
     def is_due(self, date):
         send_hour = getattr(self, date.strftime("%a"))
@@ -33,7 +32,6 @@ class User(Model):
             send_hour >= 0,
             send_hour <= date.hour,
             (last_sent.day != date.day or last_sent.hour < send_hour),
-            self.name == 'Josh'
         ])
 
     def update_last_sent(self, time):

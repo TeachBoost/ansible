@@ -3,5 +3,5 @@
 .pydevproject
 log
 ansible.db
-credentials.py
+deploy/config.py
 
