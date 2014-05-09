@@ -28,7 +28,7 @@ if [[ -f "${apppath}/deploy/secret.ini" ]] ; then
         IFS='=' read -ra ARR <<< "$line"
         find=${ARR[0]}
         replace=${ARR[1]}
-        sed -i "s/##${ARR[0]}##/${ARR[1]}/g" ${apppath}/deploy/config.py
+        sed -i "s/##${find}##/${replace}/g" ${apppath}/deploy/config.py
     done < "${apppath}/deploy/secret.ini"
 else
     touch "${apppath}/deploy/secret.ini"
