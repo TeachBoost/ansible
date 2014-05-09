@@ -1,0 +1,11 @@
+SENDER = '##MAILGUNSENDER##'
+PASSWORD = "##MAILGUNPASSWORD##"
+KEY = '##APIKEY##'
+PUBLIC_URL = '/ansible'
+SMTP_HOST = 'smtp.mailgun.org'
+SMTP_PORT = 587
+SEND_EMAIL = False
+SERVER_HOST = 'localhost'
+SERVER_PORT = 8080
+DATABASE = 'ansible.db'
+DEBUG = True
