@@ -4,7 +4,15 @@ Team tracking service. Team members send an email with what they've
 gotten done for the day, and other team members can subscribe to
 receive notifications.
 
-##  Installation
+## Dependencies
+
+Install the python dependencies:
+
+    aptitude install uwsgi uwsgi-plugin-python python-bottle nginx
+    aptitude install python-pip
+    pip install peewee
+
+## Installation
 
 * Run `./ininitalize.py` to set up the database and other requirements.
 * Create a `secret.ini` file in `/deploy` for any secret variables that

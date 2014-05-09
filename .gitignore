@@ -4,4 +4,4 @@
 log
 ansible.db
 deploy/config.py
-
+deploy/secret.ini
