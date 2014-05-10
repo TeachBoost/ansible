@@ -9,4 +9,4 @@ SEND_EMAIL = True
 SERVER_HOST = 'localhost'
 SERVER_PORT = 8080
 DATABASE = 'ansible.db'
-DEBUG = True
+DEBUG = False
