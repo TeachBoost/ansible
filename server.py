@@ -19,7 +19,7 @@ app = application = bottle.Bottle()
 ansible = bottle.Bottle()
 app.mount(settings.PUBLIC_URL, ansible)
 
-@app.post(settings.PUBLIC_URL + '/email')
+@app.post(settings.PUBLIC_URL + '/email/')
 def report():
     if bottle.request.query.get('key') != settings.KEY:
         raise Exception("Not Signed")
@@ -52,7 +52,7 @@ def report():
     if settings.DEBUG and response:
         return response
 
-@app.get(settings.PUBLIC_URL + '/email')
+@app.get(settings.PUBLIC_URL + '/email/')
 def showform():
     if settings.DEBUG:
         template = manager.get_template(settings.Templates.TEST_FORM)
@@ -72,7 +72,7 @@ def user_update(id):
     admin_manager.update(id, bottle.request.forms)
     return user_admin(id)
 
-@ansible.get('/admin')
+@ansible.get('/admin/')
 def all_admin():
     users = User.select().where(User.is_active==True)
     response = admin_manager.all_template.render(users=users)
