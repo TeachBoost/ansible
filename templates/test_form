@@ -4,7 +4,7 @@
     <title>Task Reporting Test</title>
 </head>
 <body>
-    <form action="{{public_url}}?key={{key}}" method="POST">
+    <form action="{{basepath}}/email/?key={{key}}" method="POST">
         <label for="Sender">From</label>
         <input name="Sender" />
         <label for="Subject">Subject</label>

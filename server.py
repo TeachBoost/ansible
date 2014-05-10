@@ -56,7 +56,7 @@ def report():
 def showform():
     if settings.DEBUG:
         template = manager.get_template(settings.Templates.TEST_FORM)
-        template_vars = {'key': settings.KEY, 'public_url': settings.PUBLIC_URL}
+        template_vars = {'key': settings.KEY, 'basepath': settings.BASEPATH}
         return template.render(**template_vars)
 
 @ansible.get('/admin/<id>')
