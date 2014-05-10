@@ -3,6 +3,8 @@ from os import path
 from deploy import config
 
 # The base url of the site
+BASEPATH = config.BASEPATH
+# The public path
 PUBLIC_URL = config.PUBLIC_URL
 
 # Details about the smtp server
