@@ -5,9 +5,8 @@
 </head>
 <body>
     <h1>Ansible Admin</h1>
-
     <h3>User list</h3>
-    <form method="POST" action="admin/delete">
+    <form method="POST" action="{{basepath}}/admin/delete">
         <table>
             <tr>
                 <th>Name</th>
@@ -15,18 +14,21 @@
                 <th>Delete</th>
             </tr>
             % for user in users:
-                <tr>
-                    <td><a href="admin/{{user.id}}">{{user.name}}</a></td>
-                    <td>{{user.email}}</td>
-                    <td><input name="{{user.id}}" type="checkbox" /></td>
-                </tr>
+            <tr>
+                <td><a href="{{basepath}}/admin/{{user.id}}">{{user.name}}</a></td>
+                <td>{{user.email}}</td>
+                <td><input name="{{user.id}}" type="checkbox" /></td>
+            </tr>
             % end
             <tr>
-                <td /><td /><td><button type="submit">Delete Selected</button></td>
+                <td></td>
+                <td></td>
+                <td><button type="submit">Delete Selected</button></td>
+            </tr>
         </table>
     </form>
     <h3>Create new user</h3>
-    <form method="POST" action="admin/add">
+    <form method="POST" action="{{basepath}}/admin/add">
         <label for="name">Name: </label>
         <input name="name" />
         <label for="email">Email: </label>

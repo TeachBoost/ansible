@@ -1,6 +1,7 @@
 SENDER = '##MAILGUNSENDER##'
 PASSWORD = "##MAILGUNPASSWORD##"
 KEY = '##APIKEY##'
+BASEPATH = 'http://ansible.dev'
 PUBLIC_URL = '/ansible'
 SMTP_HOST = 'smtp.mailgun.org'
 SMTP_PORT = 587

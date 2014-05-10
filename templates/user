@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Settings for {{user.name}}</h1>
-    <a href="{{home}}/admin">Back to admin</a>
+    <a href="{{basepath}}/admin">Back to admin</a>
     <form method="POST">
         <table>
             <tr>

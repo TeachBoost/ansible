@@ -65,7 +65,7 @@ def user_admin(id):
         user = User.get(id=id)
     except:
         return bottle.redirect(settings.PUBLIC_URL+ '/admin')
-    return admin_manager.user_template.render(user=user, home=settings.PUBLIC_URL)
+    return admin_manager.user_template.render(user=user, basepath=settings.BASEPATH)
 
 @ansible.post('/admin/<id>')
 def user_update(id):
@@ -75,7 +75,7 @@ def user_update(id):
 @ansible.get('/admin/')
 def all_admin():
     users = User.select().where(User.is_active==True)
-    response = admin_manager.all_template.render(users=users)
+    response = admin_manager.all_template.render(users=users, basepath=settings.BASEPATH)
     return response
 
 @ansible.post('/admin/delete')

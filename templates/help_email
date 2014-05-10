@@ -1,32 +1,48 @@
-<p>Greetings {{user.name}},<p>
+<p style="margin: 0 0 10px 0;">
+    Greetings {{user.name}}!
+<p>
 
-<p>You can manage your notifications by emailing Ansible. The email must have the word 'manage' in the subject.
-You may add a command on each line. Each part of a command should be separated by a space and there should be no more than 1 command per line.</p>
+<p style="margin: 0 0 10px 0;">
+    Welcome to the TeachBoost Ansible! You can manage your notification
+    preferences by emailing me and following these guidelines:
+</p>
+<ol style="margin: 0 0 20px 0;">
+    <li>
+        The email must have the word 'manage' in the subject line
+    </li>
+    <li>
+        All commands go on a separate line
+    </li>
+</ol>
 
-<p>Here's a list (with examples) of all available commands</p>
+<p style="margin: 0 0 10px 0;">
+    <strong>Available Commands</strong>
+</p>
 
-<p>set &lt;day&gt; &lt;time&gt;: sets the email time (24hr time) for a specific day<br />
-The command to set an email notification for 9:00am on Monday is: <br />
-set Mon 9 <br />
-The command to set an email notification for 3:00pm on Friday is: <br />
-set Fri 15</p>
+<ol style="margin: 0 0 20px 0;">
+    <li>
+        <strong>set &lt;day&gt; &lt;time&gt;</strong>
+        <br>
+        Set's the email notification time for a specific day. The time needs
+        to be in 24-hour military format. This command allows you to specify
+        what time of the given day you want to receive an email of what your
+        teammates have done.
+        <br>
+        To receive an email on Mondays at 9am type "set Mon 9"
+        <br>
+        To receive another email on Fridays at 5pm type "set Fri 17"
+    </li>
+    <li>
+        <strong>remove &lt;day&gt;</strong>
+        <br>
+        Remove all notifications for the specified day.
+        <br>
+        To remove all emails on Monday type "remove Mon"
+    </li>
+</ol>
 
-<p>remove &lt;day&gt;: removes the email time so you don't receive any more notifications on the specified day<br />
-The command to remove emails on Thursday is:<br />
-remove Thu</p>
-
-<p>adduser &lt;name&gt; &lt;email&gt;: adds a user to the system. Only admins can do this.<br />
-The command to add a user named Bob to the system is:<br />
-adduser Bob bob@bob.bob</p>
-
-<p>removeuser &lt;name&gt;: removes a user from the system. Only admins can do this.<br />
-The command to remove a user named Bob from the system is:<br />
-removeuser Bob</p>
-
-<p>admin &lt;user&gt; &lt;privilege&gt;: Grants or rescinds admin privileges to a user. Only admins can do this.<br />
-The command to give admin privileges to a user is:<br />
-admin Bob 1<br />
-The commmand to rescind admin privileges is:<br />
-admin Bob 0</p>
-
-<p>-Teachboost Ansible</p>
+<p>
+    In service,
+    <br>
+    TeachBoost Ansible
+</p>
