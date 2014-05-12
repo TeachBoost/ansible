@@ -11,13 +11,6 @@ class MailClient(object):
         Creates a new client
         '''
 
-        self.client = smtplib.SMTP(**settings.SMTP)
-        self.sender = settings.SENDER
-        self.client.ehlo()
-        self.client.starttls()
-        self.client.ehlo()
-        self.client.login(self.sender, settings.PASSWORD)
-
     def send(self, recipient, body, subject):
         '''
         Sends an email
@@ -27,6 +20,13 @@ class MailClient(object):
 
         All emails are sent from the address defined in settings.SENDER
         '''
+
+        self.client = smtplib.SMTP(**settings.SMTP)
+        self.sender = settings.SENDER
+        self.client.ehlo()
+        self.client.starttls()
+        self.client.ehlo()
+        self.client.login(self.sender, settings.PASSWORD)
 
         email = MIMEMultipart('alternative')
         email['From'] = self.sender
