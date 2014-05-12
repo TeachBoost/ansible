@@ -24,7 +24,7 @@ def report():
     if bottle.request.query.get('key') != settings.KEY:
         raise Exception("Not Signed")
 
-    sender = bottle.request.forms.get('Sender')
+    sender = bottle.request.forms.get('Sender', bottle.request.forms.get('sender') )
     try:
         user = User.get(email=sender)
     except User.DoesNotExist:
