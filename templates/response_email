@@ -1,11 +1,22 @@
-<p>Greetings {{user.name}},</p>
+<p style="margin: 0 0 10px 0;">
+    Greetings {{user.name}}!
+<p>
 
-<p>The following are responses to an email recieved from your address:</p>
+<p style="margin: 0 0 10px 0;">
+    The following are responses to an email recieved from your address:
+</p>
 
 % for response in responses:
     {{response}}<br />
 % end
 
-<p>For additional information  send an email with 'help' in the subject to {{sender}}.</p>
+<p style="margin: 0 0 10px 0; color: #999;">
+    For additional information, send an email with 'help'
+    in the subject to {{sender}}.
+</p>
 
-<p>-Teachboost Ansible</p>
+<p>
+    In service,
+    <br>
+    TeachBoost Ansible
+</p>
