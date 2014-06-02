@@ -51,6 +51,7 @@ class Templates:
     RESPONSE_EMAIL = path.join(TEMPLATE_DIR, 'response_email')
     ADMIN = path.join(TEMPLATE_DIR, 'admin')
     USER = path.join(TEMPLATE_DIR, 'user')
+    SUBSCRIPTIONS = path.join(TEMPLATE_DIR, 'subscriptions_email')
 
 # Logging setup
 logging.basicConfig(

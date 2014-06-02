@@ -11,6 +11,7 @@ from manager import ServerManager, AdminManager
 
 HELP_REGEX = re.compile("help")
 MANAGE_REGEX = re.compile("manage")
+SUBSCRIPTION_REGEX = re.compile("subscriptions")
 
 manager = ServerManager()
 admin_manager = AdminManager()
@@ -44,6 +45,10 @@ def report():
     # Command
     elif MANAGE_REGEX.search(subject):
         response = manager.manage(user, bottle.request.forms.get('stripped-text'))
+
+    # Subscriptions
+    elif SUBSCRIPTION_REGEX.search(subject):
+        response = manager.show_subscriptions(user)
 
     # Report
     else:

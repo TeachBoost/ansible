@@ -186,6 +186,7 @@ class ServerManager(Manager):
         super(ServerManager, self).__init__()
         self.help_template = self.get_template(settings.Templates.HELP_EMAIL)
         self.response_template = self.get_template(settings.Templates.RESPONSE_EMAIL)
+        self.subscription_template = self.get_template(settings.Templates.SUBSCRIPTIONS)
 
     def add_task(self, user, body):
         '''
@@ -252,6 +253,11 @@ class ServerManager(Manager):
         user.save()
         body = self.response_template.render(responses=responses, user=user, sender=settings.SENDER)
         self.mail_client.send(user, body, Subjects.RESPONSE)
+        return body
+
+    def show_subscriptions(self, user):
+        body = self.subscription_template.render(user=user, sender=settings.SENDER)
+        self.mail_client.send(user, body, Subjects.SUBSCRIPTIONS)
         return body
 
     def help(self, user):

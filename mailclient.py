@@ -11,6 +11,19 @@ class MailClient(object):
         Creates a new client
         '''
 
+    def smtp_login(self):
+        '''
+        Logs into the smtp server
+        Returns the sender's credentials
+        '''
+        self.client = smtplib.SMTP(**settings.SMTP)
+        self.sender = settings.SENDER
+        self.client.ehlo()
+        self.client.starttls()
+        self.client.ehlo()
+        self.client.login(self.sender, settings.PASSWORD)
+        return self.sender
+
     def send(self, recipient, body, subject):
         '''
         Sends an email
@@ -21,21 +34,15 @@ class MailClient(object):
         All emails are sent from the address defined in settings.SENDER
         '''
 
-        self.client = smtplib.SMTP(**settings.SMTP)
-        self.sender = settings.SENDER
-        self.client.ehlo()
-        self.client.starttls()
-        self.client.ehlo()
-        self.client.login(self.sender, settings.PASSWORD)
-
         email = MIMEMultipart('alternative')
-        email['From'] = self.sender
+        email['From'] = settings.SENDER
         email['To'] = recipient.email
         email['Subject'] = subject
         email.attach(MIMEText(body, 'html'))
 
         if settings.SEND_EMAIL:
-            self.client.sendmail(self.sender, recipient.email, email.as_string())
+            sender = self.smtp_login()
+            self.client.sendmail(sender, recipient.email, email.as_string())
         else:
             print email.as_string()
 
@@ -44,3 +51,4 @@ class Subjects:
     DIGEST = '[Teachboost] Task Digest'
     HELP = '[Teachboost] Message Help'
     RESPONSE = '[Teachboost] Manager Response'
+    SUBSCRIPTIONS = '[Teachboost] Your Subscriptions'
