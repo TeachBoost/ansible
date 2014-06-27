@@ -7,6 +7,9 @@ BASEPATH = config.BASEPATH
 # The public path
 PUBLIC_URL = config.PUBLIC_URL
 
+# The location of the project's root folder
+PROJECT_ROOT = path.dirname(path.abspath(__file__))
+
 # Details about the smtp server
 SMTP = {
     'host': config.SMTP_HOST,
@@ -41,7 +44,7 @@ PASSWORD = config.PASSWORD
 KEY = config.KEY
 
 # The location of templates
-TEMPLATE_DIR = 'templates/'
+TEMPLATE_DIR = path.join(PROJECT_ROOT, 'templates/')
 
 # Individual templates
 class Templates:
