@@ -52,7 +52,7 @@ def report():
 
     # Report
     else:
-        response = manager.add_task(user, bottle.request.forms.get('stripped-text'))
+        response = manager.add_task(user, bottle.request.forms.get('stripped-text'), subject)
 
     if settings.DEBUG and response:
         return response

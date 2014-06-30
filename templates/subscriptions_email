@@ -6,13 +6,14 @@
     The following is a list of all of your digest subscription times:
 </p>
 <ul style="margin: 0 0 20px 0;">
-    <li>Mon: {{user.Mon}}</li>
-    <li>Tue: {{user.Tue}}</li>
-    <li>Wed: {{user.Wed}}</li>
-    <li>Thu: {{user.Thu}}</li>
-    <li>Fri: {{user.Fri}}</li>
-    <li>Sat: {{user.Sat}}</li>
-    <li>Sun: {{user.Sun}}</li>
+    % for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']:
+        <li>
+            % subscription = getattr(user, day)
+            % suffix = '' if subscription is None else 'PM' if subscription > 12 else 'AM'
+            % value = subscription - 12 if subscription > 12 else subscription
+            {{day}}: {{value}} {{suffix}}
+        </li>
+    % end
 </ul>
 
 <p style="margin: 0 0 10px 0; color: #999;">

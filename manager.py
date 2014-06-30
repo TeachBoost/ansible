@@ -1,6 +1,7 @@
+import re
 import logging
 from itertools import ifilter
-from datetime import datetime
+from datetime import datetime, timedelta
 from calendar import day_abbr as DAYS
 
 from bottle import SimpleTemplate
@@ -182,13 +183,34 @@ class AdminManager(Manager):
 
 class ServerManager(Manager):
 
+    date_patterns = [
+        '%m/%d',
+        '%m-%d',
+        '%B %d',
+        '%b %d',
+        '%m/%d/%y',
+        '%m/%d/%Y',
+        '%m-%d-%y',
+        '%m-%d-%Y',
+        '%B %d %Y',
+        '%B %d %y',
+        '%B %d, %Y',
+        '%B %d, %y',
+        '%b %d %y',
+        '%b %d %Y',
+        '%b %d, %y',
+        '%b %d, %Y',
+    ]
+
+    days_ago = re.compile('^(\d+) days? ago$')
+
     def __init__(self):
         super(ServerManager, self).__init__()
         self.help_template = self.get_template(settings.Templates.HELP_EMAIL)
         self.response_template = self.get_template(settings.Templates.RESPONSE_EMAIL)
         self.subscription_template = self.get_template(settings.Templates.SUBSCRIPTIONS)
 
-    def add_task(self, user, body):
+    def add_task(self, user, body, date_unparsed = None):
         '''
         Add a task.
         user = A user object from the User table
@@ -196,8 +218,15 @@ class ServerManager(Manager):
             Each line will be made into a new task
         '''
 
+        details = {'user': user}
+        date_parsed = self._parse_date(date_unparsed.strip())
+
+        if date_parsed:
+            details['date'] = date_parsed
+
         for task in body.split('\n'):
-            Task.create(user=user, description=task)
+            details['description'] = task
+            Task.create(**details)
 
     def manage(self, user, body):
         '''
@@ -269,3 +298,36 @@ class ServerManager(Manager):
         body = self.help_template.render(user=user)
         self.mail_client.send(user, body, Subjects.HELP)
         return body
+
+    def _parse_date(self, unparsed):
+        '''
+        Converts a date string to a datetime object
+        Allowed formats are defined in date_patterns
+        Additionally, "yesterday" and 'X days ago' are
+        allowed.
+        '''
+
+        default_year = datetime.strptime('', '').year
+        parsed = None
+        delta = None
+
+        match = self.days_ago.search(unparsed)
+        if match:
+            delta = int(match.groups()[0])
+        elif unparsed.lower() == 'yesterday':
+            delta = 1
+
+        if delta:
+            return datetime.now() - timedelta(delta)
+
+        for pattern in self.date_patterns:
+            try:
+                parsed = datetime.strptime(unparsed, pattern)
+                break;
+            except ValueError:
+                pass
+        
+        if parsed and parsed.year == default_year:
+            parsed = parsed.replace(year = datetime.now().year)
+        
+        return parsed
