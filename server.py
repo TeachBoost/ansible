@@ -96,5 +96,30 @@ def admin_add():
     admin_manager.create(inputs.get('name'), inputs.get('email'))
     return bottle.redirect(settings.PUBLIC_URL + '/admin')
 
+@ansible.get('/admin/view')
+def admin_view():
+    return admin_manager.view_template.render(start=None, end=None)
+
+@ansible.post('/admin/view')
+def admin_query():
+    inputs = bottle.request.forms
+    query_type = inputs.get('type')
+
+    if query_type == 'user':
+        table = admin_manager.get_user_table()
+    elif query_type == 'task':
+        table = admin_manager.get_task_table(
+            inputs.get('start'),
+            inputs.get('end')
+        )
+    else:
+        table = ''
+
+    return admin_manager.view_template.render(
+        table=table,
+        start=inputs.get('start'),
+        end=inputs.get('end')
+    )
+
 if __name__ == '__main__':
     bottle.run(app=app, **settings.SERVER)

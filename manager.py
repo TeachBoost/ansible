@@ -4,6 +4,8 @@ from itertools import ifilter
 from datetime import datetime, timedelta
 from calendar import day_abbr as DAYS
 
+from prettytable import PrettyTable
+
 from bottle import SimpleTemplate
 import settings
 from mailclient import MailClient, Subjects
@@ -14,6 +16,27 @@ OPERAND = 1
 ARGUMENT = 2
 
 class Manager(object):
+
+    date_patterns = [
+        '%m/%d',
+        '%m-%d',
+        '%B %d',
+        '%b %d',
+        '%m/%d/%y',
+        '%m/%d/%Y',
+        '%m-%d-%y',
+        '%m-%d-%Y',
+        '%B %d %Y',
+        '%B %d %y',
+        '%B %d, %Y',
+        '%B %d, %y',
+        '%b %d %y',
+        '%b %d %Y',
+        '%b %d, %y',
+        '%b %d, %Y',
+    ]
+
+    days_ago = re.compile('^(\d+) days? ago$')
 
     def __init__(self):
         '''
@@ -36,6 +59,40 @@ class Manager(object):
         data = input_file.read()
         input_file.close()
         return SimpleTemplate(data)
+
+    def _parse_date(self, unparsed):
+        '''
+        Converts a date string to a datetime object
+        Allowed formats are defined in date_patterns
+        Additionally, "yesterday" and 'X days ago' are
+        allowed.
+        '''
+
+        default_year = datetime.strptime('', '').year
+        parsed = None
+        delta = None
+
+        match = self.days_ago.search(unparsed)
+        if match:
+            delta = int(match.groups()[0])
+        elif unparsed.lower() == 'yesterday':
+            delta = 1
+
+        if delta:
+            return datetime.now() - timedelta(delta)
+
+        for pattern in self.date_patterns:
+            try:
+                parsed = datetime.strptime(unparsed, pattern)
+                break;
+            except ValueError:
+                pass
+
+        if parsed and parsed.year == default_year:
+            parsed = parsed.replace(year = datetime.now().year)
+
+        return parsed
+
 
 
 class CronManager(Manager):
@@ -127,10 +184,12 @@ class CronManager(Manager):
 
 
 class AdminManager(Manager):
+
     def __init__(self):
         super(AdminManager, self).__init__()
         self.all_template = self.get_template(settings.Templates.ADMIN)
         self.user_template = self.get_template(settings.Templates.USER)
+        self.view_template = self.get_template(settings.Templates.DB_VIEW)
 
     def create(self, name, email):
         '''
@@ -180,29 +239,39 @@ class AdminManager(Manager):
             setattr(user, day, time)
         user.save()
 
+    def get_user_table(self):
+        table = PrettyTable(["Email", "Name", "Last sent", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "created", "active"])
+        for user in User.select():
+            table.add_row([
+                user.email,
+                user.name,
+                user.last_sent,
+                user.Mon,
+                user.Tue,
+                user.Wed,
+                user.Thu,
+                user.Fri,
+                user.Sat,
+                user.Sun,
+                user.created,
+                user.is_active,
+            ])
+        return table
+
+    def get_task_table(self, start = None, end = None):
+        table = PrettyTable(["Name", 'Date', 'Description'])
+        start = self._parse_date(start)
+        end = self._parse_date(end)
+        query = Task.select().where(Task.date.between(start, end)) if\
+            all([start, end]) else Task.select()
+
+        for task in query:
+            table.add_row([task.user.name, task.date, task.description])
+
+        return table
+
 
 class ServerManager(Manager):
-
-    date_patterns = [
-        '%m/%d',
-        '%m-%d',
-        '%B %d',
-        '%b %d',
-        '%m/%d/%y',
-        '%m/%d/%Y',
-        '%m-%d-%y',
-        '%m-%d-%Y',
-        '%B %d %Y',
-        '%B %d %y',
-        '%B %d, %Y',
-        '%B %d, %y',
-        '%b %d %y',
-        '%b %d %Y',
-        '%b %d, %y',
-        '%b %d, %Y',
-    ]
-
-    days_ago = re.compile('^(\d+) days? ago$')
 
     def __init__(self):
         super(ServerManager, self).__init__()
@@ -298,36 +367,3 @@ class ServerManager(Manager):
         body = self.help_template.render(user=user)
         self.mail_client.send(user, body, Subjects.HELP)
         return body
-
-    def _parse_date(self, unparsed):
-        '''
-        Converts a date string to a datetime object
-        Allowed formats are defined in date_patterns
-        Additionally, "yesterday" and 'X days ago' are
-        allowed.
-        '''
-
-        default_year = datetime.strptime('', '').year
-        parsed = None
-        delta = None
-
-        match = self.days_ago.search(unparsed)
-        if match:
-            delta = int(match.groups()[0])
-        elif unparsed.lower() == 'yesterday':
-            delta = 1
-
-        if delta:
-            return datetime.now() - timedelta(delta)
-
-        for pattern in self.date_patterns:
-            try:
-                parsed = datetime.strptime(unparsed, pattern)
-                break;
-            except ValueError:
-                pass
-        
-        if parsed and parsed.year == default_year:
-            parsed = parsed.replace(year = datetime.now().year)
-        
-        return parsed

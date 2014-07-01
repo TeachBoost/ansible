@@ -55,6 +55,7 @@ class Templates:
     ADMIN = path.join(TEMPLATE_DIR, 'admin')
     USER = path.join(TEMPLATE_DIR, 'user')
     SUBSCRIPTIONS = path.join(TEMPLATE_DIR, 'subscriptions_email')
+    DB_VIEW = path.join(TEMPLATE_DIR, 'database_view')
 
 # Logging setup
 logging.basicConfig(
