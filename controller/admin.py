@@ -6,8 +6,7 @@ from bottle import redirect, request, HTTPResponse
 import settings
 from model import User, Task
 from library.template import Template
-from library.auth import auth, admin_only, self_only
-from library.auth import debug_only, admin_only_with_user
+from library.auth import auth, admin_only, self_only, debug_only
 
 template = Template()
 ONE_WEEK = 7
@@ -16,22 +15,28 @@ ONE_WEEK = 7
 def index(user):
     return template.render('index.tpl', user=user, title='Welcome')
 
+
+@auth
 @self_only
 def update_self(id, user):
     user.update_schedule(request.forms)
     user.save()
     return redirect(settings.PUBLIC_URL)
 
+
+@auth
 @admin_only
-def admin():
+def admin(user):
     ''' Show the admin page '''
     users = User.select().where(User.is_active==True)
     return template.render(
        'admin.tpl', users=users, title='Admin',
        email_url=(settings.EMAIL_URL if settings.DEBUG else None))
 
+
+@auth
 @admin_only
-def create_person():
+def create_person(user):
     name = request.forms.get('name')
     email = request.forms.get('email')
     if not name or not email:
@@ -47,8 +52,10 @@ def create_person():
 
     return redirect('{0}/admin/{1}'.format(settings.PUBLIC_URL, person.id))
 
+
+@auth
 @admin_only
-def read_person(id):
+def read_person(id, user):
     try:
         person = User.get(id=id)
     except:
@@ -56,7 +63,8 @@ def read_person(id):
     return template.render('read_person.tpl', person=person)
 
 
-@admin_only_with_user
+@auth
+@admin_only
 def update_person(id, user):
     try:
         person = User.get(id=id)
@@ -70,8 +78,9 @@ def update_person(id, user):
     return template.render('read_person.tpl', person=person)
 
 
+@auth
 @admin_only
-def read_tasks():
+def read_tasks(user):
     zero = {'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0}
     try:
         week = int(request.query.get('w', 0))
@@ -83,8 +92,10 @@ def read_tasks():
     tasks = Task.select().where(Task.date > start, Task.date <= end)
     return template.render('read_tasks.tpl', tasks=tasks, start=start, week=week)
 
+
+@auth
 @admin_only
-def delete_people():
+def delete_people(user):
     for id in request.forms:
         try:
             person = User.get(id=id)
