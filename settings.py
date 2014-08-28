@@ -1,11 +1,15 @@
 import logging
 from os import path
+
 from deploy import config
 
 # The base url of the site
 BASEPATH = config.BASEPATH
 # The public path
 PUBLIC_URL = config.PUBLIC_URL
+
+# The email listener url
+EMAIL_URL = config.EMAIL_URL
 
 # The location of the project's root folder
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
@@ -44,7 +48,7 @@ PASSWORD = config.PASSWORD
 KEY = config.KEY
 
 # The location of templates
-TEMPLATE_DIR = path.join(PROJECT_ROOT, 'templates/')
+TEMPLATE_DIR = path.join(PROJECT_ROOT, 'view/')
 
 # Individual templates
 class Templates:
@@ -56,6 +60,7 @@ class Templates:
     USER = path.join(TEMPLATE_DIR, 'user')
     SUBSCRIPTIONS = path.join(TEMPLATE_DIR, 'subscriptions_email')
     DB_VIEW = path.join(TEMPLATE_DIR, 'database_view')
+    INDEX = path.join(TEMPLATE_DIR, 'index')
 
 # Logging setup
 logging.basicConfig(

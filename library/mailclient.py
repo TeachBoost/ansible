@@ -43,9 +43,7 @@ class MailClient(object):
         if settings.SEND_EMAIL:
             sender = self.smtp_login()
             self.client.sendmail(sender, recipient.email, email.as_string())
-        else:
-            print email.as_string()
-
+        return email.as_string().split('\n')
 
 class Subjects:
     DIGEST = '[Teachboost] Task Digest'

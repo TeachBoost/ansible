@@ -21,13 +21,17 @@ def create_tables():
     Task.create_table()
 
 def populate():
-    User.create(name="Andrew", email="andrew@teachboost.com")
     User.create(name="Jason", email="jason@teachboost.com")
-    User.create(name="Jill", email="jill@teachboost.com")
-    User.create(name="Josh", email="josh@teachboost.com")
-    User.create(name="Kate", email="kate@teachboost.com")
-    User.create(name="Mike", email="mike@teachboost.com")
+    User.create(name="Mike", email="mike@teachboost.com", is_admin=True)
+    User.create(name="Andrew", email="andrew@teachboost.com")
     User.create(name="Peter", email="peter@teachboost.com")
+    User.create(name="Jill", email="jill@teachboost.com")
+    User.create(name="Kate", email="kate@teachboost.com")
+    User.create(name="Josh", email="josh@teachboost.com", is_admin=True)
+    User.create(name="Ben", email="ben@teachboost.com")
+    User.create(name="Andy", email="amacdonald@teachboost.com")
+    User.create(name="Amy", email="amy@teachboost.com")
+    User.create(name="Talia", email="talia@teachboost.com")
 
 if __name__ == "__main__":
     force = '-f' in sys.argv

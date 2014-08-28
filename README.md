@@ -11,7 +11,6 @@ Install the python dependencies:
     aptitude install uwsgi uwsgi-plugin-python python-bottle nginx
     aptitude install python-pip
     pip install peewee
-    pip install prettytable
 
 ## Installation
 
