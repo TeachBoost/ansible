@@ -1,3 +1,5 @@
+import logging
+
 from bottle import HTTPResponse, request
 
 import settings
@@ -6,6 +8,8 @@ from model import User
 def auth(function):
     def decorate(*args, **kwargs):
         email = 'josh@teachboost.com'
+	logging.info('VERIFIED: ' + request.environ.get('VERIFIED'))
+	logging.info('DN: ' + request.environ.get("DN"))
         try:
             user = User.get(email=email)
         except:
@@ -53,8 +57,7 @@ def debug_only(function):
 
 def auth_email(function):
     def decorate(*args, **kwargs):
-        if request.query.get('key') != settings.KEY:
-            print 'bad key'
+	if request.query.get('key') != settings.KEY:
             return forbidden()
         sender = request.forms.get('Sender', request.forms.get('sender'))
         try:
