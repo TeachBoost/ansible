@@ -17,6 +17,7 @@ db = SqliteDatabase(settings.DATABASE)
 # model files for each defined model class #
 ############################################
 
+
 class User(Model):
     class Meta:
         database = db
@@ -84,6 +85,3 @@ class Task(Model):
     user = ForeignKeyField(User)
     date = DateTimeField(default=datetime.now)
     description = TextField()
-
-    def between(self, start, end):
-        return self.select().where(date < end).where(date > start)

@@ -1,9 +1,8 @@
 SENDER = '##MAILGUNSENDER##'
 PASSWORD = '##MAILGUNPASSWORD##'
 KEY = '##APIKEY##'
-BASEPATH = 'https://teachboost.net/ansible'
-PUBLIC_URL = '/ansible'
-EMAIL_URL = '/ansible/email'
+PUBLIC_URL = 'https://teachboost.net/ansible'
+BASEPATH = '/ansible'
 SMTP_HOST = 'smtp.mailgun.org'
 SMTP_PORT = 587
 SEND_EMAIL = True

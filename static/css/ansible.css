@@ -1,0 +1,92 @@
+/* http://paletton.com/#uid=13X0u0kmJFscrSsi7LQrp-twcsN */
+html, body, div, form, label, ul, input{
+    margin: 0;
+    padding: 0; 
+}
+
+body{
+    font-family: Geneva, Tahoma, Verdana, sans-serif;
+}
+
+fieldset{
+    padding: 10px;
+}
+
+legend{
+    text-align: center;
+    font-size: 3em;
+}
+
+li{
+    list-style: none;
+    display: inline-block;
+}
+
+header{
+    padding: 10px;
+    height: 90px;
+    width: 960px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+header div{
+    line-height: 90px;
+    font-size: 9em;
+}
+
+main{
+    width: 960px;
+    margin: 0 auto;
+}
+
+table{
+    font-size: 2em;
+}
+
+#subscriptions ul{
+    width: 100%;
+}
+
+#subscriptions li{
+    width: 113px;
+    margin: 0 10px;
+}
+
+#subscriptions li div{
+    width: 100px;
+}
+
+#subscriptions .admin-toggle{
+    float:right;
+    font-size: 3em;
+    margin: .3em .3em 0 0;
+}
+
+#subscriptions input:not([type="checkbox"]){
+    width: 80%;
+    height: 70px;
+    padding: 0 0 0 20px;
+    font-size: 3em;
+}
+
+#subscriptions button{
+    margin: 10px 20px 0 0;
+    float: right;
+}
+
+.subscription-day{
+    margin: 0 0 0 5px;
+    font-size: 2em;
+}
+
+.cf:before,
+.cf:after{
+    content: "";
+    display: block;
+}
+
+.cf:after{
+    clear: both;
+}
+

@@ -1,6 +1,5 @@
 #! /usr/bin/python
 import logging
-import sys
 from datetime import datetime
 from itertools import ifilter
 
@@ -8,6 +7,7 @@ import settings
 from model import User, Task
 from library.template import Template
 from library.mailclient import MailClient, Subjects
+
 
 class Cron(object):
     def __init__(self):
@@ -19,7 +19,7 @@ class Cron(object):
             self.mail_buffer = []
 
     def job(self):
-        users = User.select().where(User.is_active==True)
+        users = User.select().where(User.is_active == True)
         print [user.name for user in users]
         for user in ifilter(lambda user: user.is_due(self.now), users):
             try:
@@ -37,11 +37,10 @@ class Cron(object):
                 user.last_sent = self.now
                 user.save()
 
-
     def create_digest(self, user):
         last_sent = user.last_sent or user.created
         tasks = Task.select()\
-            .where((Task.date>last_sent))\
+            .where((Task.date > last_sent))\
             .order_by(Task.user.name, Task.date)
         email_params = {
             'user': user,

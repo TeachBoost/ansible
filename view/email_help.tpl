@@ -15,43 +15,8 @@
 </p>
 
 <p>
-    You can manage your notification
-    preferences by emailing Ansible and following these guidelines:
+    You may manage your settings by visiting <a href="{{_public_url}}">Ansible</a>
 </p>
-<ol style="margin: 0 0 20px 0;">
-    <li>
-        The email must have the word 'manage' in the subject line
-    </li>
-    <li>
-        All commands go on a separate line
-    </li>
-</ol>
-
-<p style="margin: 0 0 10px 0;">
-    <strong>Available Commands</strong>
-</p>
-
-<ol style="margin: 0 0 20px 0;">
-    <li>
-        <strong>set &lt;day&gt; &lt;time&gt;</strong>
-        <br>
-        Set's the email notification time for a specific day. The time needs
-        to be in 24-hour military format. This command allows you to specify
-        what time of the given day you want to receive an email of what your
-        teammates have done.
-        <br>
-        To receive an email on Mondays at 9am type "set Mon 9"
-        <br>
-        To receive another email on Fridays at 5pm type "set Fri 17"
-    </li>
-    <li>
-        <strong>remove &lt;day&gt;</strong>
-        <br>
-        Remove all notifications for the specified day.
-        <br>
-        To remove all emails on Monday type "remove Mon"
-    </li>
-</ol>
 
 <p style="margin: 0 0 10px 0;">
     You may also see all of your subscriptions by sending an email with <strong>subscriptions</strong> in the subject line.

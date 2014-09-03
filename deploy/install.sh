@@ -36,5 +36,3 @@ fi
 
 echo ''
 echo 'Done! Make sure you run the SQL statements.'
-echo 'For help, run ./update_sql_db.sh -h'
-

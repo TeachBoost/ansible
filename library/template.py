@@ -4,13 +4,16 @@ from bottle import SimpleTemplate
 
 import settings
 
+
 class Template(object):
     templates = {}
 
     def __init__(self):
         self.context = {
             '_template_dir': settings.TEMPLATE_DIR,
-            '_basepath': settings.PUBLIC_URL,
+            '_static_path': settings.STATIC_PATH,
+            '_basepath': settings.BASEPATH,
+            '_public_url': settings.PUBLIC_URL,
         }
 
     def render(self, name, **vars):

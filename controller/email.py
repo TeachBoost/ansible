@@ -1,41 +1,40 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bottle import request, HTTPResponse
 
-from model import User, Task
+from model import Task
 from library.auth import debug_only, auth_email
 from library.template import Template
 from library.mailclient import MailClient, Subjects
 import settings
 
-
 template = Template()
 mailclient = MailClient()
-
 
 HELP_REGEX = re.compile('help')
 MANAGE_REGEX = re.compile('manage')
 SUBSCRIPTION_REGEX = re.compile('subscriptions')
 DAYS_AGO = re.compile('^(\d+) days? ago$')
 DATE_PATTERNS = [
-        '%m/%d',
-        '%m-%d',
-        '%B %d',
-        '%b %d',
-        '%m/%d/%y',
-        '%m/%d/%Y',
-        '%m-%d-%y',
-        '%m-%d-%Y',
-        '%B %d %Y',
-        '%B %d %y',
-        '%B %d, %Y',
-        '%B %d, %y',
-        '%b %d %y',
-        '%b %d %Y',
-        '%b %d, %y',
-        '%b %d, %Y',
-    ]
+    '%m/%d',
+    '%m-%d',
+    '%B %d',
+    '%b %d',
+    '%m/%d/%y',
+    '%m/%d/%Y',
+    '%m-%d-%y',
+    '%m-%d-%Y',
+    '%B %d %Y',
+    '%B %d %y',
+    '%B %d, %Y',
+    '%B %d, %y',
+    '%b %d %y',
+    '%b %d %Y',
+    '%b %d, %y',
+    '%b %d, %Y',
+]
+
 
 @debug_only
 def test_form():
@@ -53,10 +52,11 @@ def receive_email(user):
 
     elif SUBSCRIPTION_REGEX.search(subject):
         body = read_subscriptions(user)
-        email = mailclient.send(user, body, Subjects.SUBSCRIPTIONS) if body else None
+        email = mailclient.send(user, body, Subjects.SUBSCRIPTIONS)\
+            if body else None
 
-    elif MANAGE_REGEX.search(subject):
-        body = update_subscriptions(user, body)
+#     elif MANAGE_REGEX.search(subject):
+#         body = update_subscriptions(user, body)
 
     else:
         body = log_tasks(user, subject, body)
@@ -65,9 +65,13 @@ def receive_email(user):
     if not email:
         return HTTPResponse(500)
 
-    if type(email) != bool and settings.DEBUG:
-        return template.render('show_email.tpl', email=email)
-    return HTTPResponse(status=200)
+    if settings.DEBUG:
+        return template.render(
+            'show_email.tpl',
+            email=(email if email is not True else ["No response"]), user=user
+        )
+    else:
+        return HTTPResponse(status=200)
 
 
 def parse_date(unparsed):
@@ -93,12 +97,12 @@ def parse_date(unparsed):
     for pattern in DATE_PATTERNS:
         try:
             parsed = datetime.strptime(unparsed, pattern)
-            break;
+            break
         except ValueError:
             pass
 
     if parsed and parsed.year == default_year:
-        parsed = parsed.replace(year = datetime.now().year)
+        parsed = parsed.replace(year=datetime.now().year)
 
     return parsed
 
@@ -109,7 +113,11 @@ def help(user):
 
 def read_subscriptions(user):
     return template.render(
-       'email_subscriptions.tpl', user=user, sender=settings.SENDER)
+        'email_subscriptions.tpl', user=user, sender=settings.SENDER)
+
+
+# def update_subscriptions(user, body):
+#     pass
 
 
 def log_tasks(user, subject, body):

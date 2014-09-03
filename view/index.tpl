@@ -1,26 +1,18 @@
 % include(_template_dir + 'header.tpl')
-<h1>Welcome to Ansible {{user.name}}</h1>
-<div>
-    <h3>Manage my subscriptions</h3>
+<fieldset id="subscriptions">
+    <legend>Manage my subscriptions</legend>
     <form method="post" action="{{_basepath}}/update/{{user.id}}">
-        <table>
-            <tr>
-                <th>Day</th>
-                <th>Time</th>
-            </tr>
+        <ul class="cf"><!--
             % for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']:
-                <tr>
-                    <td>{{day}}</td>
-                    <td><input style="width:40px" name="{{day}}" value="{{getattr(user, day) if getattr(user, day) else ''}}" /></td>
-                </tr>
+                --><li>
+                    <div class="subscription-day">{{day}}</div>
+                    <div class="subscription-time">
+                        <input name="{{day}}" value="{{getattr(user, day) if getattr(user, day) else ''}}" />
+                    </div>
+                </li><!--
             % end
-        </table>
+        --></ul>
         <button type="submit">Save</button>
     </form>
-</div>
-% if user.is_admin:
-    <div>
-        <h3><a href="{{_basepath}}/admin">Ansible Admin</a></h3>
-    </div>
-% end
+</fieldset>
 % include(_template_dir + 'footer.tpl')

@@ -24,5 +24,4 @@
     <a href="{{_basepath}}/admin/tasks?w={{week-1}}">next</a>
     % end
 </h2>
-<h3><a href="{{_basepath}}/admin">Back to admin</a></h3>
 % include(_template_dir + 'footer.tpl')

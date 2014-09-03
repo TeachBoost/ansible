@@ -3,6 +3,7 @@ from bottle import HTTPResponse, request
 import settings
 from model import User
 
+
 def auth(function):
     def decorate(*args, **kwargs):
         email = 'josh@teachboost.com'
@@ -54,7 +55,6 @@ def debug_only(function):
 def auth_email(function):
     def decorate(*args, **kwargs):
         if request.query.get('key') != settings.KEY:
-            print 'bad key'
             return forbidden()
         sender = request.forms.get('Sender', request.forms.get('sender'))
         try:
@@ -66,8 +66,8 @@ def auth_email(function):
     return decorate
 
 
-def forbidden():
-    return HTTPResponse(status=403, body="403: Forbidden")
+def forbidden(text=''):
+    return HTTPResponse(status=403, body="403: Forbidden -- " + text)
 
 
 def bad_request():

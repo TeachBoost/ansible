@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 
 import settings
 
+
 class MailClient(object):
 
     def __init__(self):
@@ -44,6 +45,7 @@ class MailClient(object):
             sender = self.smtp_login()
             self.client.sendmail(sender, recipient.email, email.as_string())
         return email.as_string().split('\n')
+
 
 class Subjects:
     DIGEST = '[Teachboost] Task Digest'

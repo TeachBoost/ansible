@@ -4,12 +4,14 @@ from os import path
 from deploy import config
 
 # The base url of the site
-BASEPATH = config.BASEPATH
+BASEPATH = config.BASEPATH  # '/ansible'
 # The public path
-PUBLIC_URL = config.PUBLIC_URL
+PUBLIC_URL = config.PUBLIC_URL  # 'localhost:8080'
 
 # The email listener url
-EMAIL_URL = config.EMAIL_URL
+EMAIL_PATH = BASEPATH + '/email'
+ADMIN_PATH = BASEPATH + '/admin'
+STATIC_PATH = BASEPATH + '/static'
 
 # The location of the project's root folder
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
@@ -33,7 +35,8 @@ SERVER = {}
 if hasattr(config, 'SERVER_HOST') and hasattr(config, 'SERVER_PORT'):
     SERVER['host'] = config.SERVER_HOST
     SERVER['port'] = config.SERVER_PORT
-    SERVER['debug'] = DEBUG # In debug mode, error messages will be returned in HTTP responses
+    # In debug mode, error messages will be returned in HTTP responses
+    SERVER['debug'] = DEBUG
 
 # The name of the database file
 DATABASE = config.DATABASE
@@ -49,18 +52,6 @@ KEY = config.KEY
 
 # The location of templates
 TEMPLATE_DIR = path.join(PROJECT_ROOT, 'view/')
-
-# Individual templates
-class Templates:
-    TEST_FORM = path.join(TEMPLATE_DIR, 'test_form')
-    DIGEST_EMAIL = path.join(TEMPLATE_DIR, 'digest_email')
-    HELP_EMAIL = path.join(TEMPLATE_DIR, 'help_email')
-    RESPONSE_EMAIL = path.join(TEMPLATE_DIR, 'response_email')
-    ADMIN = path.join(TEMPLATE_DIR, 'admin')
-    USER = path.join(TEMPLATE_DIR, 'user')
-    SUBSCRIPTIONS = path.join(TEMPLATE_DIR, 'subscriptions_email')
-    DB_VIEW = path.join(TEMPLATE_DIR, 'database_view')
-    INDEX = path.join(TEMPLATE_DIR, 'index')
 
 # Logging setup
 logging.basicConfig(

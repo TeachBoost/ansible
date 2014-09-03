@@ -1,15 +1,15 @@
-import sys
 from datetime import datetime, timedelta
 
-from bottle import redirect, request, HTTPResponse
+from bottle import redirect, request
 
 import settings
 from model import User, Task
 from library.template import Template
-from library.auth import auth, admin_only, self_only, debug_only
+from library.auth import auth, admin_only, self_only
 
 template = Template()
 ONE_WEEK = 7
+
 
 @auth
 def index(user):
@@ -21,17 +21,22 @@ def index(user):
 def update_self(id, user):
     user.update_schedule(request.forms)
     user.save()
-    return redirect(settings.PUBLIC_URL)
+    return redirect(settings.BASEPATH)
 
 
 @auth
 @admin_only
 def admin(user):
     ''' Show the admin page '''
-    users = User.select().where(User.is_active==True)
+    users = User.select().where(User.is_active == True).order_by(User.name)
+    print users
     return template.render(
-       'admin.tpl', users=users, title='Admin',
-       email_url=(settings.EMAIL_URL if settings.DEBUG else None))
+        'admin.tpl',
+        users=users,
+        title='Admin',
+        user=user,
+        email_url=(settings.EMAIL_PATH if settings.DEBUG else None)
+    )
 
 
 @auth
@@ -39,8 +44,8 @@ def admin(user):
 def create_person(user):
     name = request.forms.get('name')
     email = request.forms.get('email')
-    if not name or not email:
-        return redirect(settings.PUBLIC_URL)
+    if name or not email:
+        return redirect(settings.ADMIN_PATH)
 
     try:
         person = User.get(email=email)
@@ -48,9 +53,9 @@ def create_person(user):
         person.is_active = True
         person.save()
     except:
-        person = User.create(name=name, email=email)
+        person = User.create(name=name, email=email, user=user)
 
-    return redirect('{0}/admin/{1}'.format(settings.PUBLIC_URL, person.id))
+    return redirect('{0}/{1}'.format(settings.ADMIN_PATH, person.id))
 
 
 @auth
@@ -59,8 +64,8 @@ def read_person(id, user):
     try:
         person = User.get(id=id)
     except:
-        return redirect(settings.PUBLIC_URL)
-    return template.render('read_person.tpl', person=person)
+        return redirect(settings.ADMIN_PATH)
+    return template.render('read_person.tpl', person=person, user=user)
 
 
 @auth
@@ -69,13 +74,14 @@ def update_person(id, user):
     try:
         person = User.get(id=id)
     except:
-        return redirect(settings.PUBLIC_URL)
+        return redirect(settings.ADMIN_PATH)
 
-    person.is_admin = user.id == person.id or request.forms.get('is_admin', False)
+    person.is_admin = user.id == person.id \
+        or request.forms.get('is_admin', False)
     person.update_schedule(request.forms)
     person.save()
 
-    return template.render('read_person.tpl', person=person)
+    return template.render('read_person.tpl', person=person, user=user)
 
 
 @auth
@@ -90,7 +96,13 @@ def read_tasks(user):
     start = current - timedelta(current.weekday())
     end = start + timedelta(ONE_WEEK)
     tasks = Task.select().where(Task.date > start, Task.date <= end)
-    return template.render('read_tasks.tpl', tasks=tasks, start=start, week=week)
+    return template.render(
+        'read_tasks.tpl',
+        tasks=tasks,
+        start=start,
+        week=week,
+        user=user
+    )
 
 
 @auth
@@ -103,4 +115,4 @@ def delete_people(user):
             person.save()
         except:
             pass
-    return redirect(settings.PUBLIC_URL + '/admin')
+    return redirect(settings.ADMIN_PATH)
