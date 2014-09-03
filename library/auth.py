@@ -9,8 +9,10 @@ from model import User
 def auth(function):
     def decorate(*args, **kwargs):
         email = 'josh@teachboost.com'
-	logging.info('VERIFIED: ' + request.environ.get('VERIFIED'))
-	logging.info('DN: ' + request.environ.get("DN"))
+        logging.info('VERIFIED: ')
+        logging.info(request.environ.get('VERIFIED'))
+        logging.info('DN: ')
+        logging.info(request.environ.get("DN"))
         try:
             user = User.get(email=email)
         except:
