@@ -1,3 +1,5 @@
+import logging
+
 from bottle import HTTPResponse, request
 
 import settings
@@ -7,6 +9,8 @@ from model import User
 def auth(function):
     def decorate(*args, **kwargs):
         email = 'josh@teachboost.com'
+	logging.info('VERIFIED: ' + request.environ.get('VERIFIED'))
+	logging.info('DN: ' + request.environ.get("DN"))
         try:
             user = User.get(email=email)
         except:
