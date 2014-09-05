@@ -1,8 +1,8 @@
 % include(_template_dir + 'header.tpl')
-    <fieldset id="subscriptions">
+    <fieldset id="user-settings">
     <legend>Settings for {{person.name}}</legend>
     <form method="post">
-        <ul class="cf"><!--
+        <ul class="cf subscriptions"><!--
             % for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']:
                 --><li>
                     <div class="subscription-day">{{day}}</div>
@@ -13,7 +13,11 @@
             % end
         --></ul>
         <button type="submit">Save</button>
-        <div class="admin-toggle">
+        <div class="user-details">
+            <label for="serial">Serial: </label>
+            <input class="serial" name="serial" value="{{person.serial}}" />
+            <label for="email">Email: </label>
+            <input class="email" name="email" value="{{person.email}}" />
             <label>
                 <input type="checkbox" name="is_admin" {{'checked' if person.is_admin else ''}}>
                 Admin
@@ -21,30 +25,4 @@
         </div>
     </form>
     </fieldset>
-    
-    
-    <!--
-    <h1>Settings for {{person.name}}</h1>
-    <form method="post">
-        <table>
-            <tr>
-                <th>Day</th>
-                <th>Time</th>
-            </tr>
-            % for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']:
-                <tr>
-                    <td>{{day}}</td>
-                    <td><input style="width:40px" name="{{day}}" value="{{getattr(person, day) if getattr(person,day) else ''}}" /></td>
-                </tr>
-            % end
-        </table>
-            <div>
-                <label>
-                    Admin
-                    <input type="checkbox" name="is_admin" {{'checked' if person.is_admin else ''}}>
-                </label>
-            </div>
-        <button type="submit">Save</button>
-    </form>
-    -->
 % include(_template_dir + 'footer.tpl')

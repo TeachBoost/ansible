@@ -22,8 +22,9 @@ class User(Model):
     class Meta:
         database = db
 
-    email = CharField(index=True)
+    email = CharField(index=True, unique=True)
     name = CharField()
+    serial = CharField(index=True, unique=True)
     last_sent = DateTimeField(null=True)
     Mon = IntegerField(null=True)
     Tue = IntegerField(null=True)

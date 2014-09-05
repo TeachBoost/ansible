@@ -8,13 +8,15 @@ from model import User
 
 def auth(function):
     def decorate(*args, **kwargs):
-        email = 'josh@teachboost.com'
-        logging.info('VERIFIED: ')
-        logging.info(request.environ.get('VERIFIED'))
-        logging.info('DN: ')
-        logging.info(request.environ.get("DN"))
+        serial = request.environ.get('SERIAL')
+        verified = request.environ.get('VERIFIED') == 'SUCCESS'
+        if settings.DEBUG:
+            verified = True
+            serial = serial or '06'
+        if not (serial and verified):
+            return forbidden()
         try:
-            user = User.get(email=email)
+            user = User.get(serial=serial)
         except:
             user = None
         if not (user and user.is_active):

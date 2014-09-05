@@ -23,17 +23,17 @@ def create_tables():
 
 
 def populate():
-    User.create(name="Jason", email="jason@teachboost.com")
-    User.create(name="Mike", email="mike@teachboost.com", is_admin=True)
-    User.create(name="Andrew", email="andrew@teachboost.com")
-    User.create(name="Peter", email="peter@teachboost.com")
-    User.create(name="Jill", email="jill@teachboost.com")
-    User.create(name="Kate", email="kate@teachboost.com")
-    User.create(name="Josh", email="josh@teachboost.com", is_admin=True)
-    User.create(name="Ben", email="ben@teachboost.com")
-    User.create(name="Andy", email="amacdonald@teachboost.com")
-    User.create(name="Amy", email="amy@teachboost.com")
-    User.create(name="Talia", email="talia@teachboost.com")
+    User.create(serial='08', name="Jason", email="jason@teachboost.com")
+    User.create(serial='02', name="Mike", email="mike@teachboost.com", is_admin=True)
+    User.create(serial='03', name="Andrew", email="andrew@teachboost.com")
+    User.create(serial='09', name="Peter", email="peter@teachboost.com")
+    User.create(serial='0A', name="Jill", email="jill@teachboost.com")
+    User.create(serial='0C', name="Kate", email="kate@teachboost.com")
+    User.create(serial='06', name="Josh", email="josh@teachboost.com", is_admin=True)
+    User.create(serial='0B', name="Ben", email="ben@teachboost.com")
+    User.create(serial='0E', name="Andy", email="amacdonald@teachboost.com")
+    User.create(serial='0D', name="Amy", email="amy@teachboost.com")
+    User.create(serial='07', name="Talia", email="talia@teachboost.com")
 
 if __name__ == "__main__":
     force = '-f' in sys.argv

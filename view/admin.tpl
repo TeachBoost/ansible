@@ -28,6 +28,8 @@
     <label for="email">Email: </label>
     <input name="email" type="email" />
     <br />
+    <label for="serial">Serial: </label>
+    <input name="serial" />
     <button type="submit">Create</button>
 </form>
 <h3>

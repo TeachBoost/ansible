@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from bottle import redirect, request
+from peewee import IntegrityError
 
 import settings
 from model import User, Task
@@ -44,16 +45,23 @@ def admin(user):
 def create_person(user):
     name = request.forms.get('name')
     email = request.forms.get('email')
-    if name or not email:
+    serial = request.forms.get('serial')
+    if not any([name, email, serial]):
         return redirect(settings.ADMIN_PATH)
 
     try:
         person = User.get(email=email)
-        person.name = name
-        person.is_active = True
-        person.save()
     except:
-        person = User.create(name=name, email=email, user=user)
+        person = User()
+        person.email = email
+    person.name = name
+    person.serial = serial
+    person.is_active = True
+
+    try:
+        person.save()
+    except IntegrityError:
+        return redirect(settings.ADMIN_PATH)
 
     return redirect('{0}/{1}'.format(settings.ADMIN_PATH, person.id))
 
@@ -78,8 +86,14 @@ def update_person(id, user):
 
     person.is_admin = user.id == person.id \
         or request.forms.get('is_admin', False)
+    person.serial = request.forms.get('serial')
+    person.email = request.forms.get('email')
     person.update_schedule(request.forms)
-    person.save()
+
+    try:
+        person.save()
+    except IntegrityError:
+        person = User.get(id=id)
 
     return template.render('read_person.tpl', person=person, user=user)
 

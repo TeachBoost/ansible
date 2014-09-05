@@ -44,33 +44,34 @@ table{
     font-size: 2em;
 }
 
-#subscriptions ul{
+#user-settings ul{
     width: 100%;
 }
 
-#subscriptions li{
+#user-settings li{
     width: 113px;
     margin: 0 10px;
 }
 
-#subscriptions li div{
+#user-settings li div{
     width: 100px;
 }
 
-#subscriptions .admin-toggle{
-    float:right;
-    font-size: 3em;
+#user-settings .user-details{
+    font-size: 2em;
     margin: .3em .3em 0 0;
 }
 
-#subscriptions input:not([type="checkbox"]){
+#user-settings .subscriptions input:not([type="checkbox"]){
     width: 80%;
     height: 70px;
     padding: 0 0 0 20px;
     font-size: 3em;
 }
 
-#subscriptions button{
+
+
+#user-settings button{
     margin: 10px 20px 0 0;
     float: right;
 }
@@ -78,6 +79,10 @@ table{
 .subscription-day{
     margin: 0 0 0 5px;
     font-size: 2em;
+}
+
+.serial{
+    width: 50px;
 }
 
 .cf:before,
