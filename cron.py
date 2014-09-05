@@ -11,14 +11,17 @@ from library.mailclient import MailClient, Subjects
 
 class Cron(object):
     def __init__(self):
+        print "Construction cron object"
         self.now = datetime.now()
+        print "Determined current time"
         self.template = Template()
+        print "Created template manager"
         self.mailclient = MailClient()
-
-        if settings.DEBUG:
-            self.mail_buffer = []
+        print "Created mail client"
+        print "Finished constructing cron Object"
 
     def job(self):
+        pring "Getting users"
         users = User.select().where(User.is_active == True)
         print "Users: " + [user.name for user in users]
         for user in ifilter(lambda user: user.is_due(self.now), users):
