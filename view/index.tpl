@@ -12,6 +12,10 @@
                 </li><!--
             % end
         --></ul>
+        <label>
+            <input type="checkbox" name="send_reminders" {{'checked' if user.send_reminders else ''}}>
+            Send Update Reminders
+        </label>
         <button type="submit">Save</button>
     </form>
 </fieldset>

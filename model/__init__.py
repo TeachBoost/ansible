@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from calendar import day_abbr as DAYS
 
 from peewee import SqliteDatabase, CharField, ForeignKeyField, \
@@ -33,6 +33,7 @@ class User(Model):
     Fri = IntegerField(null=True)
     Sat = IntegerField(null=True)
     Sun = IntegerField(null=True)
+    send_reminders = BooleanField(default=True)
     is_admin = BooleanField(default=False, null=True)
     created = DateTimeField(default=datetime.now)
     is_active = BooleanField(default=True)
@@ -43,15 +44,28 @@ class User(Model):
         A user is due if they have a subscription for the current day
         that is between their last_sent datetime and the current datetime
         '''
-        zero_minutes = {'minute': 0, 'second': 0, 'microsecond': 0}
         subscription_hour = getattr(self, date.strftime("%a"), None)
-        last_sent = self.last_sent or datetime.fromtimestamp(0)
-
         if not subscription_hour:
             return
 
+        zero_minutes = {'minute': 0, 'second': 0, 'microsecond': 0}
+        last_sent = self.last_sent or datetime.fromtimestamp(0)
         subscription = date.replace(hour=subscription_hour, **zero_minutes)
         return date >= subscription and last_sent < subscription
+
+    def needs_reminding(self, date):
+        '''
+        Determines if a user should be reminded to send their task email for
+        the day.
+        A user should be reminded if they have not emailed by the time defined
+        in settings.REPORT_DUE
+        '''
+        last_sent = self.last_sent or datetime.fromtimestamp(0)
+        return all([
+            date.strftime('%H')  >= settings.REPORT_DUE,
+            self.send_reminders,
+            not(last_sent.day == date.day),
+        ])
 
     def update_last_sent(self, time):
         '''

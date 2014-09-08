@@ -11,28 +11,26 @@ from library.mailclient import MailClient, Subjects
 
 class Cron(object):
     def __init__(self):
-        print "Construction cron object"
         self.now = datetime.now()
-        print "Determined current time"
         self.template = Template()
-        print "Created template manager"
         self.mailclient = MailClient()
-        print "Created mail client"
-        print "Finished constructing cron Object"
 
     def job(self):
-        pring "Getting users"
         users = User.select().where(User.is_active == True)
-        print "Users: " + [user.name for user in users]
         for user in ifilter(lambda user: user.is_due(self.now), users):
-            print "Creating digest for {0}".format(user.name)
+            self.send_digest(user)
+        for user in ifilter(lambda user: user.needs_reminding(self.now), users):
+            self.send_reminder(user)
+
+
+    def send_reminder(self, user):
+        print "Reminding {0}".format(user.name)
+
+    def send_digest(self, user):
             try:
                 digest = self.create_digest(user)
-                print "Successfully created digest for {0}".format(user.name)
                 email = self.mailclient.send(user, digest, Subjects.DIGEST)
-                print "Sent digest to {0}".format(user.name)
             except:
-                print "Couldn't send digest to {0}".format(user.name)
                 logging.error("Failed to send email to {0}".format(user.name))
                 if settings.DEBUG:
                     raise
@@ -62,14 +60,9 @@ class Cron(object):
 # Cron for creating digest emails
 if __name__ == '__main__':
     try:
-        print "Starting cron"
         cron = Cron()
         cron.job()
-        print "Finished cron"
     except Exception as e:
         logging.error(e)
         if settings.DEBUG:
             raise
-else:
-    print "Cron should be run as __main__."
-    print "Ran as {0} instead.".format(__name__)

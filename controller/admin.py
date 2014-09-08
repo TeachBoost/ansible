@@ -21,6 +21,7 @@ def index(user):
 @self_only
 def update_self(id, user):
     user.update_schedule(request.forms)
+    user.send_reminders = request.forms.get('send_reminders')
     user.save()
     return redirect(settings.BASEPATH)
 
@@ -30,7 +31,6 @@ def update_self(id, user):
 def admin(user):
     ''' Show the admin page '''
     users = User.select().where(User.is_active == True).order_by(User.name)
-    print users
     return template.render(
         'admin.tpl',
         users=users,
@@ -84,11 +84,12 @@ def update_person(id, user):
     except:
         return redirect(settings.ADMIN_PATH)
 
+    person.update_schedule(request.forms)
     person.is_admin = user.id == person.id \
         or request.forms.get('is_admin', False)
     person.serial = request.forms.get('serial')
     person.email = request.forms.get('email')
-    person.update_schedule(request.forms)
+    person.send_reminders = request.forms.get('send_reminders')
 
     try:
         person.save()

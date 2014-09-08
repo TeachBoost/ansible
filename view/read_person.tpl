@@ -22,6 +22,11 @@
                 <input type="checkbox" name="is_admin" {{'checked' if person.is_admin else ''}}>
                 Admin
             </label>
+            <br />
+            <label>
+                <input type="checkbox" name="send_reminders" {{'checked' if person.send_reminders else ''}}>
+                Send Reminders
+            </label>
         </div>
     </form>
     </fieldset>

@@ -28,6 +28,9 @@ DEBUG = config.DEBUG
 # Enable email sending
 SEND_EMAIL = config.SEND_EMAIL
 
+# Due time for daily reporting
+REPORT_DUE = 16
+
 # Details about the Bottle server which listens for incomming messages
 # Only used when running from terminal. Configure nginx server separately.
 SERVER = {}
@@ -39,7 +42,7 @@ if hasattr(config, 'SERVER_HOST') and hasattr(config, 'SERVER_PORT'):
     SERVER['debug'] = DEBUG
 
 # The name of the database file
-DATABASE = config.DATABASE
+DATABASE = path.join(PROJECT_ROOT, config.DATABASE)
 
 # The email addres messages will come from
 SENDER = config.SENDER
