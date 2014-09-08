@@ -14,9 +14,9 @@
     By default Ansible will use the date it receives your email, but if you want to
     report tasks from a day in the past, put the date in the subject of the email:
 </p>
-<p style="margin: 0 0 10px 25px; color: #999;">
-    - "6/12", "Jun 12", "June 12"
-    - You can also use "yesterday" or "X days ago" where X is an integer
+<p style="margin: 0 0 10px 25px; color: #333;">
+    - "6/12", "Jun 12", "June 12"<br />
+    - You can also use "yesterday" or "X days ago" where X is an integer<br />
     - Support for future tasks was going to have not been added... yet.
 </p>
 <p style="margin: 0 0 10px 0;">
