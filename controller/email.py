@@ -1,5 +1,7 @@
 import re
 from datetime import datetime, timedelta
+from itertools import ifilter
+import logging
 
 from bottle import request, HTTPResponse
 
@@ -14,6 +16,7 @@ mailclient = MailClient()
 
 HELP_REGEX = re.compile('help')
 MANAGE_REGEX = re.compile('manage')
+LINBREAK_REGEX = re.compile
 SUBSCRIPTION_REGEX = re.compile('subscriptions')
 DAYS_AGO = re.compile('^(\d+) days? ago$')
 DATE_PATTERNS = [
@@ -126,6 +129,12 @@ def log_tasks(user, subject, body):
     if date:
         details['date'] = date
 
-    for task in body.split('\n'):
+    for task in parse_body(body):
+        logging.info(task)
         details['description'] = task
         Task.create(**details)
+
+
+def parse_body(body):
+    lines = re.sub('\n(?!\n)', ' ', re.sub('\r', '', body)).split('\n')
+    return ifilter(None, map(str.strip, lines))
