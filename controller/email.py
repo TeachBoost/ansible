@@ -16,7 +16,6 @@ mailclient = MailClient()
 
 HELP_REGEX = re.compile('help')
 MANAGE_REGEX = re.compile('manage')
-LINBREAK_REGEX = re.compile
 SUBSCRIPTION_REGEX = re.compile('subscriptions')
 DAYS_AGO = re.compile('^(\d+) days? ago$')
 DATE_PATTERNS = [

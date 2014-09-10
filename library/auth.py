@@ -63,19 +63,20 @@ def debug_only(function):
 def auth_email(function):
     def decorate(*args, **kwargs):
         if request.query.get('key') != settings.KEY:
-            return forbidden()
+            return forbidden('Unsigned')
         sender = request.forms.get('Sender', request.forms.get('sender'))
         try:
             user = User.get(email=sender)
         except:
-            return forbidden()
+            return forbidden('Unrecoginzed sender: ' + sender)
         kwargs['user'] = user
         return function(*args, **kwargs)
     return decorate
 
 
 def forbidden(text=''):
-    return HTTPResponse(status=403, body="403: Forbidden -- " + text)
+    body = "403: Forbidden{0}{1}".format(' -- ' if text else '', text)
+    return HTTPResponse(status=403, body=body)
 
 
 def bad_request():
