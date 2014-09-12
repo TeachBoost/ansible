@@ -1,6 +1,6 @@
 #! /usr/bin/python
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import ifilter
 
 import settings
@@ -14,33 +14,26 @@ class Cron(object):
         self.now = datetime.now()
         self.template = Template()
         self.mailclient = MailClient()
+        self.failure = "Failed to send email with subject {} to {}."
+        self.success = "Sent email with subject {} to {}.\n"
 
     def job(self):
         users = User.select().where(User.is_active == True)
         for user in ifilter(lambda user: user.is_due(self.now), users):
-            self.send_digest(user)
-        for user in ifilter(lambda user: user.needs_reminding(self.now), users):
-            self.send_reminder(user)
+            self.send_email(user, self.create_digest, Subjects.DIGEST)
+            self.update_last_sent(user)
+        for user in ifilter(lambda user: user.is_late(self.now), users):
+            self.send_email(user, self.create_reminder, Subjects.REMINDER)
 
-
-    def send_reminder(self, user):
-        print "Reminding {0}".format(user.name)
-
-    def send_digest(self, user):
-            try:
-                digest = self.create_digest(user)
-                email = self.mailclient.send(user, digest, Subjects.DIGEST)
-            except:
-                logging.error("Failed to send email to {0}".format(user.name))
-                if settings.DEBUG:
-                    raise
-
+    def send_email(self, user, create_email, subject):
+        try:
+            self.mailclient.send(user, create_email(user), subject)
             if settings.DEBUG:
-                print user.name
-                print email, '\n\n'
-            else:
-                user.last_sent = self.now
-                user.save()
+                print self.success.format(subject, user.name)
+        except:
+            logging.error(self.failure.format(subject, user.name))
+            if settings.DEBUG:
+                raise
 
     def create_digest(self, user):
         last_sent = user.last_sent or user.created
@@ -52,9 +45,18 @@ class Cron(object):
             'start': last_sent,
             'end': self.now,
             'tasks': tasks,
-            'sender': settings.SENDER
+            'sender': settings.SENDER,
+            'timezone_correct': timedelta(hours=user.timezone)
         }
         return self.template.render('email_digest.tpl', **email_params)
+
+    def create_reminder(self, user):
+        return self.template.render('email_reminder.tpl', user=user)
+
+    def update_last_sent(self, user):
+        if not settings.DEBUG:
+            user.last_sent = self.now
+            user.save()
 
 
 # Cron for creating digest emails

@@ -1,6 +1,6 @@
 <p style="margin: 0 0 10px 0;">
     Greetings {{user.name}}!
-<p>
+</p>
 
 <p style="margin: 0 0 10px 0;">
     This is your summary of completed tasks from {{start.strftime("%B %d, %Y")}} to {{end.strftime("%B %d, %Y")}}.
@@ -17,7 +17,7 @@
 
     % if task.date.strftime("%B %D, %Y") != date:
         <div style="margin:0 0 5px 0;">
-            <strong>{{task.date.strftime("%B %d, %Y")}}</strong>
+            <strong>{{(task.date + timezone_correct).strftime("%B %d, %Y")}}</strong>
         </div>
         <ul>
     % end

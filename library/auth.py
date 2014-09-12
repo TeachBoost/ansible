@@ -67,15 +67,17 @@ def auth_email(function):
         sender = request.forms.get('Sender', request.forms.get('sender'))
         try:
             user = User.get(email=sender)
-        except:
-            return forbidden('Unrecoginzed sender: ' + sender)
+        except Exception as e:
+            return forbidden('Unrecoginzed sender: ' + sender, e)
         kwargs['user'] = user
         return function(*args, **kwargs)
     return decorate
 
 
-def forbidden(text=''):
+def forbidden(text='', exception=''):
     body = "403: Forbidden{0}{1}".format(' -- ' if text else '', text)
+    if exception:
+        logging.error(exception)
     return HTTPResponse(status=403, body=body)
 
 

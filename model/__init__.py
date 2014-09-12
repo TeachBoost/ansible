@@ -2,12 +2,17 @@ from datetime import datetime, timedelta
 from calendar import day_abbr as DAYS
 
 from peewee import SqliteDatabase, CharField, ForeignKeyField, \
-    DateTimeField, TextField, IntegerField, Model, BooleanField
+    DateTimeField, TextField, IntegerField, Model, BooleanField, \
+    FloatField
 
 import settings
 
 
 db = SqliteDatabase(settings.DATABASE)
+zero_minutes = {'minute': 0, 'second': 0, 'microsecond': 0}
+ONE_DAY = timedelta(1)
+NEVER = datetime.fromtimestamp(0)
+
 
 ############################################
 # For now there's only one model file, but #
@@ -22,10 +27,13 @@ class User(Model):
     class Meta:
         database = db
 
-    email = CharField(index=True, unique=True)
     name = CharField()
+    email = CharField(index=True, unique=True)
     serial = CharField(index=True, unique=True)
-    last_sent = DateTimeField(null=True)
+    timezone = FloatField(default=-5.0)  # Eastern
+    send_reminders = BooleanField(default=True, null=True)
+    is_admin = BooleanField(default=False, null=True)
+    is_active = BooleanField(default=True)
     Mon = IntegerField(null=True)
     Tue = IntegerField(null=True)
     Wed = IntegerField(null=True)
@@ -33,38 +41,52 @@ class User(Model):
     Fri = IntegerField(null=True)
     Sat = IntegerField(null=True)
     Sun = IntegerField(null=True)
-    send_reminders = BooleanField(default=True)
-    is_admin = BooleanField(default=False, null=True)
+    last_sent = DateTimeField(null=True)
+    last_reminded = DateTimeField(null=True)
     created = DateTimeField(default=datetime.now)
-    is_active = BooleanField(default=True)
 
     def is_due(self, date):
         '''
         Determines if a user is due to recieve a digest email
-        A user is due if they have a subscription for the current day
-        that is between their last_sent datetime and the current datetime
+        A user is due if:
+            they have a subscription for the current day
+            it is past the time of their subscription
+            the last email was sent before today's subscription time
         '''
         subscription_hour = getattr(self, date.strftime("%a"), None)
         if not subscription_hour:
             return
 
-        zero_minutes = {'minute': 0, 'second': 0, 'microsecond': 0}
-        last_sent = self.last_sent or datetime.fromtimestamp(0)
+        last_sent = self.last_sent or NEVER
         subscription = date.replace(hour=subscription_hour, **zero_minutes)
         return date >= subscription and last_sent < subscription
 
-    def needs_reminding(self, date):
+    def is_late(self, date):
         '''
-        Determines if a user should be reminded to send their task email for
-        the day.
-        A user should be reminded if they have not emailed by the time defined
-        in settings.REPORT_DUE
+        Determines if a user is late sending their task email for the day and
+        should be reminded. Uses the deadline defined in settings.REPORT_DUE
+        A user should be reminded if:
+            it is past the deadline for reporting
+            they have not emailed for 24 hours before the deadline
+            they have not already been sent a reminder in the last 24 hours
+            they are configured to receive reminders
+            it is not a weekend
         '''
-        last_sent = self.last_sent or datetime.fromtimestamp(0)
+        last_reminded = self.last_reminded or NEVER
+        deadline = date.replace(hour=settings.REPORT_DUE, **zero_minutes)
+        try:
+            last_task = Task.select(Task.date).where(Task.user == self)\
+                .order_by(Task.date.desc()).get()
+            last_reported = last_task.date
+        except:
+            last_reported = NEVER
+
         return all([
-            date.strftime('%H')  >= settings.REPORT_DUE,
+            date >= deadline,
+            deadline - last_reported > ONE_DAY,
+            date - last_reminded > ONE_DAY,
             self.send_reminders,
-            not(last_sent.day == date.day),
+            date.strftime('%a') not in ['Sat', 'Sun'],
         ])
 
     def update_last_sent(self, time):
@@ -87,6 +109,8 @@ class User(Model):
                 time = int(time)
                 if time < 0 or time >= 24:
                     time = None
+                else:
+                    time = int(time - self.timezone)
             except:
                 time = None
             setattr(self, day, time)

@@ -1,5 +1,4 @@
 #! /usr/bin/python
-
 ''' Initalization script. Should only be run once. '''
 
 import os
@@ -8,13 +7,67 @@ import sys
 from model import User, Task
 import settings
 
+tables = {'user': User, 'task': Task}
 
-def delete_db(db_file, force):
-    if os.path.isfile(db_file):
-        if force:
-            os.remove(db_file)
-        else:
-            return True
+users = [
+    {
+        'name': "Jason",
+        'email': "jason@teachboost.com",
+        'serial': '08',
+    },
+    {
+        'name':  'Mike',
+        'email': 'mike@teachboost.com',
+        'serial': '02',
+        'is_admin': True,
+    },
+    {
+        'name':  'Andrew',
+        'email': 'andrew@teachboost.com',
+        'serial': '03',
+    },
+    {
+        'name':  'Peter',
+        'email': 'peter@teachboost.com',
+        'serial': '09',
+    },
+    {
+        'name':  'Jill',
+        'email': 'jill@teachboost.com',
+        'serial': '0A',
+    },
+    {
+        'name':  'Kate',
+        'email': 'kate@teachboost.com',
+        'serial': '0C',
+    },
+    {
+        'name':  'Josh',
+        'email': 'josh@teachboost.com',
+        'serial': '06',
+        'is_admin': True,
+    },
+    {
+        'name':  'Ben',
+        'email': 'ben@teachboost.com',
+        'serial': '0B',
+    },
+    {
+        'name':  'Andy',
+        'email': 'amacdonald@teachboost.com',
+        'serial': '0E',
+    },
+    {
+        'name':  'Amy',
+        'email': 'amy@teachboost.com',
+        'serial': '0D',
+    },
+    {
+        'name':  'Talia',
+        'email': 'talia@teachboost.com',
+        'serial': '07',
+    },
+]
 
 
 def create_tables():
@@ -23,24 +76,37 @@ def create_tables():
 
 
 def populate():
-    User.create(serial='08', name="Jason", email="jason@teachboost.com")
-    User.create(serial='02', name="Mike", email="mike@teachboost.com", is_admin=True)
-    User.create(serial='03', name="Andrew", email="andrew@teachboost.com")
-    User.create(serial='09', name="Peter", email="peter@teachboost.com")
-    User.create(serial='0A', name="Jill", email="jill@teachboost.com")
-    User.create(serial='0C', name="Kate", email="kate@teachboost.com")
-    User.create(serial='06', name="Josh", email="josh@teachboost.com", is_admin=True)
-    User.create(serial='0B', name="Ben", email="ben@teachboost.com")
-    User.create(serial='0E', name="Andy", email="amacdonald@teachboost.com")
-    User.create(serial='0D', name="Amy", email="amy@teachboost.com")
-    User.create(serial='07', name="Talia", email="talia@teachboost.com")
+    for user in users:
+        User.create(Mon=22, Thu=22, **user)
 
-if __name__ == "__main__":
-    force = '-f' in sys.argv
-    exists = delete_db(settings.DATABASE, force)
-    if exists:
-        print ''''A database already exists.
-        Run with -f to delete and reinitialize'''
+
+def rebuild_table(table):
+    Table = tables[table]
+    Table.drop_table()
+    Table.create_table()
+    if Table == User:
+        populate()
+
+
+def initialize(delete, table):
+    if table:
+        rebuild_table(table)
     else:
+        if delete:
+            os.remove(settings.DATABASE)
         create_tables()
         populate()
+
+
+if __name__ == "__main__":
+    table_index = sys.argv.index('-t') if '-t' in sys.argv else None
+    table = sys.argv[table_index + 1] if table_index is not None else None
+    delete = '-d' in sys.argv
+    exists = os.path.isfile(settings.DATABASE)
+
+    if exists and not (delete or table):
+        print ''''A database already exists.
+        Run with -d to delete existing database
+        Run with -t <tablename> to rebuild a single table'''
+    else:
+        initialize(exists and delete, table)

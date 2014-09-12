@@ -57,9 +57,13 @@ table{
     width: 100px;
 }
 
-#user-settings .user-details{
+.user-details{
     font-size: 2em;
     margin: .3em .3em 0 0;
+}
+
+.user-details div{
+    margin-top: 20px;
 }
 
 #user-settings .subscriptions input:not([type="checkbox"]){
@@ -69,10 +73,7 @@ table{
     font-size: 3em;
 }
 
-
-
 #user-settings button{
-    margin: 10px 20px 0 0;
     float: right;
 }
 

@@ -52,3 +52,4 @@ class Subjects:
     HELP = '[Teachboost] Message Help'
     RESPONSE = '[Teachboost] Manager Response'
     SUBSCRIPTIONS = '[Teachboost] Your Subscriptions'
+    REMINDER = '[Teachboost] Friendly Reminder'

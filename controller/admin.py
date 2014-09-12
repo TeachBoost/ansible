@@ -14,12 +14,18 @@ ONE_WEEK = 7
 
 @auth
 def index(user):
-    return template.render('index.tpl', user=user, title='Welcome')
+    return template.render(
+        'index.tpl',
+        user=user,
+        title='Welcome',
+        timezones=settings.TIMEZONES
+    )
 
 
 @auth
 @self_only
 def update_self(id, user):
+    user.timezone = float(request.forms.get('timezone'))
     user.update_schedule(request.forms)
     user.send_reminders = request.forms.get('send_reminders')
     user.save()
@@ -73,7 +79,12 @@ def read_person(id, user):
         person = User.get(id=id)
     except:
         return redirect(settings.ADMIN_PATH)
-    return template.render('read_person.tpl', person=person, user=user)
+    return template.render(
+        'read_person.tpl',
+        person=person,
+        user=user,
+        timezones=settings.TIMEZONES
+    )
 
 
 @auth
@@ -84,19 +95,25 @@ def update_person(id, user):
     except:
         return redirect(settings.ADMIN_PATH)
 
-    person.update_schedule(request.forms)
     person.is_admin = user.id == person.id \
         or request.forms.get('is_admin', False)
     person.serial = request.forms.get('serial')
     person.email = request.forms.get('email')
+    person.timezone = float(request.forms.get('timezone'))
     person.send_reminders = request.forms.get('send_reminders')
+    person.update_schedule(request.forms)
 
     try:
         person.save()
     except IntegrityError:
         person = User.get(id=id)
 
-    return template.render('read_person.tpl', person=person, user=user)
+    return template.render(
+        'read_person.tpl',
+        person=person,
+        user=user,
+        timezones=settings.TIMEZONES
+    )
 
 
 @auth

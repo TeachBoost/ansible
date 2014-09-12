@@ -126,7 +126,7 @@ def log_tasks(user, subject, body):
     details = {'user': user}
     date = parse_date(subject)
     if date:
-        details['date'] = date
+        details['date'] = date - timedelta(hours=user.timezone)
 
     for task in parse_body(body):
         logging.info(task)

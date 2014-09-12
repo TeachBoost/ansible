@@ -7,7 +7,7 @@
 </p>
 <p style="margin: 0 0 10px 0;">
     To use Ansible, send an email to Ansible with a list of each task you've completed.
-    Eeach task should be on a separate line.
+    Each task should be separated by a blank line in the body of your email.
 </p>
 <p style="margin: 0 0 5px 0;">
     When you send tasks to Ansible, it will record the date you completed the task.
@@ -28,6 +28,6 @@
 </p>
 <p>
     In service,
-    <br>
+    <br />
     TeachBoost Ansible
 </p>
