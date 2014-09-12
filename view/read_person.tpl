@@ -6,8 +6,15 @@
             % for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']:
                 --><li>
                     <div class="subscription-day">{{day}}</div>
-                    <div class="subscription-time">
-                        <input name="{{day}}" value="{{int(getattr(person, day) + person.timezone) if getattr(person, day) else ''}}" />
+                    <select name="{{day}}">
+                        % has = getattr(person, day) is not None
+                        <option> None </option>
+                        % for hour in range(0, 24):
+                            <option value="{{hour}}" {{'selected' if has and int(getattr(person, day) + person.timezone) == hour else ''}}>
+                                {{hour % 12 or 12}}:00 {{'A' if hour < 12 else 'P'}}M
+                            </option>
+                        % end
+                    </select>
                     </div>
                 </li><!--
             % end

@@ -66,11 +66,8 @@ table{
     margin-top: 20px;
 }
 
-#user-settings .subscriptions input:not([type="checkbox"]){
-    width: 80%;
-    height: 70px;
-    padding: 0 0 0 20px;
-    font-size: 3em;
+#user-settings .subscriptions select{
+    width: 110%;
 }
 
 #user-settings button{
