@@ -10,8 +10,8 @@ from library.mailclient import MailClient, Subjects
 
 
 class Cron(object):
-    def __init__(self):
-        self.now = datetime.now()
+    def __init__(self, now):
+        self.now = now
         self.template = Template()
         self.mailclient = MailClient()
         self.failure = "Failed to send email with subject {} to {}."
@@ -24,6 +24,7 @@ class Cron(object):
             self.update_last_sent(user)
         for user in ifilter(lambda user: user.is_late(self.now), users):
             self.send_email(user, self.create_reminder, Subjects.REMINDER)
+            self.update_last_reminded(user)
 
     def send_email(self, user, create_email, subject):
         try:
@@ -58,11 +59,16 @@ class Cron(object):
             user.last_sent = self.now
             user.save()
 
+    def update_last_reminded(self, user):
+        if not settings.DEBUG:
+            user.last_reminded = self.now
+            user.save()
+
 
 # Cron for creating digest emails
 if __name__ == '__main__':
     try:
-        cron = Cron()
+        cron = Cron(datetime.now())
         cron.job()
     except Exception as e:
         logging.error(e)

@@ -26,7 +26,7 @@ SMTP = {
 DEBUG = config.DEBUG
 
 # Enable email sending
-SEND_EMAIL = config.SEND_EMAIL
+SEND_EMAIL = False
 
 # Deadline time for daily reporting in 24hr UTC time
 REPORT_DUE = 21
@@ -58,7 +58,7 @@ TEMPLATE_DIR = path.join(PROJECT_ROOT, 'view/')
 
 # Logging setup
 logging.basicConfig(
-    filename="log",
+    filename=path.join(PROJECT_ROOT, "log"),
     level=logging.INFO,
     format="%(asctime)s %(levelname)-8s %(message)s"
 )

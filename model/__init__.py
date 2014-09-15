@@ -54,9 +54,10 @@ class User(Model):
             the last email was sent before today's subscription time
         '''
         subscription_hour = getattr(self, date.strftime("%a"), None)
-        if not subscription_hour:
+        if subscription_hour is None:
             return
 
+        subscription_hour = int(subscription_hour + self.timezone)
         last_sent = self.last_sent or NEVER
         subscription = date.replace(hour=subscription_hour, **zero_minutes)
         return date >= subscription and last_sent < subscription
