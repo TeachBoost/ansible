@@ -8,9 +8,12 @@
 
 % person = None
 % date = None
+
+<div>
 % for task in tasks:
     % if task.user != person:
         % date = None
+        </div>
         <div style="margin: 0 0 10px 0;">
             <h3 style="font-size: 1.2em;">{{task.user.name}}</h3>
     % end
@@ -28,13 +31,10 @@
         </ul>
     % end
 
-    % if task.user != person:
-        </div>
-    % end
-
     % date = task.date.strftime("%B %D, %Y")
     % person = task.user
 % end
+</div>
 
 <p style="margin: 0 0 10px 0; color: #999;">
     This email was created on {{end.strftime("%B %d, %Y at %I:%M:%S %p")}}.

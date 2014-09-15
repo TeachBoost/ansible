@@ -1,6 +1,6 @@
 import re
 from datetime import datetime, timedelta
-from itertools import ifilter
+from itertools import takewhile, ifilter
 import logging
 
 from bottle import request, HTTPResponse
@@ -129,11 +129,26 @@ def log_tasks(user, subject, body):
         details['date'] = date - timedelta(hours=user.timezone)
 
     for task in parse_body(body):
-        logging.info(task)
         details['description'] = task
         Task.create(**details)
 
 
+def is_not_signature(line):
+    return not reduce(
+        lambda accum, pattern: accum or re.search(pattern, line),
+        [
+            '^-- ?\n',
+            '-----Original Message-----',
+            '________________________________',
+            '^On.*wrote:\n',
+            '^From: ',
+            '^Sent from my iPhone',
+            '^Sent from my BlackBerry',
+        ],
+        False
+    )
+
+
 def parse_body(body):
     lines = re.sub('\n(?!\n)', ' ', re.sub('\r', '', body)).split('\n')
-    return ifilter(None, map(str.strip, lines))
+    return ifilter(None, takewhile(is_not_signature, map(str.strip, lines)))
