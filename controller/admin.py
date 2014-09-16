@@ -10,6 +10,7 @@ from library.auth import auth, admin_only, self_only
 
 template = Template()
 ONE_WEEK = 7
+ROUND_HOUR = {'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0}
 
 
 @auth
@@ -18,7 +19,8 @@ def index(user):
         'index.tpl',
         user=user,
         title='Welcome',
-        timezones=settings.TIMEZONES
+        timezones=settings.TIMEZONES,
+        hide_link=True
     )
 
 
@@ -31,6 +33,29 @@ def update_self(id, user):
     user.save()
     return redirect(settings.BASEPATH)
 
+
+@auth
+@self_only
+def read_user_tasks(id, user):
+    try:
+        week = int(request.query.get('w', 0))
+    except:
+        week = 0
+    current = datetime.now().replace(**ROUND_HOUR) - timedelta(week * ONE_WEEK)
+    start = current - timedelta(current.weekday())
+    end = start + timedelta(ONE_WEEK)
+    tasks = Task.select().where(
+        Task.user == user,
+        Task.date > start,
+        Task.date <= end)
+    return template.render(
+        'read_tasks.tpl',
+        tasks=tasks,
+        start=start,
+        week=week,
+        user=user,
+        link="/tasks/{}".format(id)
+    )
 
 @auth
 @admin_only
@@ -119,12 +144,11 @@ def update_person(id, user):
 @auth
 @admin_only
 def read_tasks(user):
-    zero = {'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0}
     try:
         week = int(request.query.get('w', 0))
     except:
         week = 0
-    current = datetime.now().replace(**zero) - timedelta(week * ONE_WEEK)
+    current = datetime.now().replace(**ROUND_HOUR) - timedelta(week * ONE_WEEK)
     start = current - timedelta(current.weekday())
     end = start + timedelta(ONE_WEEK)
     tasks = Task.select().where(Task.date > start, Task.date <= end)
@@ -133,7 +157,8 @@ def read_tasks(user):
         tasks=tasks,
         start=start,
         week=week,
-        user=user
+        user=user,
+        link='/admin/tasks'
     )
 
 

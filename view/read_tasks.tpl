@@ -19,9 +19,9 @@
     </tbody>
 </table>
 <h2>
-    <a href="{{_basepath}}/admin/tasks?w={{week+1}}">previous</a>
-    <a href="{{_basepath}}/admin/tasks">current</a>
-    <a href="{{_basepath}}/admin/tasks?w={{week-1}}">next</a>
+    <a href="{{_basepath}}{{link}}?w={{week+1}}">previous</a>
+    <a href="{{_basepath}}{{link}}">current</a>
+    <a href="{{_basepath}}{{link}}?w={{week-1}}">next</a>
     % end
 </h2>
 % include(_template_dir + 'footer.tpl')

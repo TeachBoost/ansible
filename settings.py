@@ -26,7 +26,7 @@ SMTP = {
 DEBUG = config.DEBUG
 
 # Enable email sending
-SEND_EMAIL = False
+SEND_EMAIL = config.SEND_EMAIL
 
 # Deadline time for daily reporting in 24hr UTC time
 REPORT_DUE = 21

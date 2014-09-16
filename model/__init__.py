@@ -66,7 +66,7 @@ class User(Model):
         if not due:
             logging.info("Skipping {}'s digest".format(self.name))
             logging.info("    subscription: {}".format(subscription.strftime("%c")))
-            logging.info("    last_sent: {}".format(self.last_sent.strftime("%c")))
+            logging.info("    last_sent: {}".format(last_sent.strftime("%c")))
         else:
             logging.info("{} is due".format(self.name))
         return due

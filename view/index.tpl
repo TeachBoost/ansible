@@ -38,4 +38,5 @@
         <button type="submit">Save</button>
     </form>
 </fieldset>
+<h2><a href="{{_basepath}}/tasks/{{user.id}}">View my tasks</a></h2>
 % include(_template_dir + 'footer.tpl')
