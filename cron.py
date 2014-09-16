@@ -22,9 +22,11 @@ class Cron(object):
         for user in ifilter(lambda user: user.is_due(self.now), users):
             self.send_email(user, self.create_digest, Subjects.DIGEST)
             self.update_last_sent(user)
+            logging.info("Sent digest to {}".format(user.name))
         for user in ifilter(lambda user: user.is_late(self.now), users):
             self.send_email(user, self.create_reminder, Subjects.REMINDER)
             self.update_last_reminded(user)
+            logging.info("Sent reminder to {}".format(user.name))
 
     def send_email(self, user, create_email, subject):
         try:
@@ -68,8 +70,11 @@ class Cron(object):
 # Cron for creating digest emails
 if __name__ == '__main__':
     try:
-        cron = Cron(datetime.now())
+        now = datetime.now()
+        logging.info("="*16 + " Starting cron " + "="*16)
+        cron = Cron(now)
         cron.job()
+        logging.info("="*16 + " Finished cron " + "="*16)
     except Exception as e:
         logging.error(e)
         if settings.DEBUG:

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from calendar import day_abbr as DAYS
+import logging
 
 from peewee import SqliteDatabase, CharField, ForeignKeyField, \
     DateTimeField, TextField, IntegerField, Model, BooleanField, \
@@ -55,12 +56,20 @@ class User(Model):
         '''
         subscription_hour = getattr(self, date.strftime("%a"), None)
         if subscription_hour is None:
+            logging.info("{} has no subscription for today".format(self.name))
             return
 
         subscription_hour = int(subscription_hour + self.timezone)
         last_sent = self.last_sent or NEVER
         subscription = date.replace(hour=subscription_hour, **zero_minutes)
-        return date >= subscription and last_sent < subscription
+        due = date >= subscription and last_sent < subscription
+        if not due:
+            logging.info("Skipping {}'s digest".format(self.name))
+            logging.info("    subscription: {}".format(subscription.strftime("%c")))
+            logging.info("    last_sent: {}".format(self.last_sent.strftime("%c")))
+        else:
+            logging.info("{} is due".format(self.name))
+        return due
 
     def is_late(self, date):
         '''
@@ -82,13 +91,23 @@ class User(Model):
         except:
             last_reported = NEVER
 
-        return all([
+        late = all([
             date >= deadline,
             deadline - last_reported > ONE_DAY,
             date - last_reminded > ONE_DAY,
             self.send_reminders,
             date.strftime('%a') not in ['Sat', 'Sun'],
         ])
+
+        if not late:
+            logging.info("Skipping {}'s reminder".format(self.name))
+            logging.info("    deadline: {}".format(deadline.strftime("%c")))
+            logging.info("    last_reminded: {}".format(last_reminded.strftime("%c")))
+            logging.info("    last_reported: {}".format(last_reported.strftime("%c")))
+            logging.info("    send_reminders: {}".format(self.send_reminders))
+        else:
+            logging.info("{} is late".format(self.name))
+        return late
 
     def update_last_sent(self, time):
         '''
