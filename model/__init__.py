@@ -62,6 +62,7 @@ class User(Model):
         subscription_hour = int(subscription_hour + self.timezone)
         last_sent = self.last_sent or NEVER
         subscription = date.replace(hour=subscription_hour, **zero_minutes)
+        subscription -= timedelta(hours=self.timezone)
         due = date >= subscription and last_sent < subscription
         if not due:
             logging.info("Skipping {}'s digest".format(self.name))

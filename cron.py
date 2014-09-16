@@ -71,10 +71,10 @@ class Cron(object):
 if __name__ == '__main__':
     try:
         now = datetime.now()
-        logging.info("="*16 + " Starting cron " + "="*16)
+        logging.info("="*14 + " Starting cron " + "="*14)
         cron = Cron(now)
         cron.job()
-        logging.info("="*16 + " Finished cron " + "="*16)
+        logging.info("="*14 + " Finished cron " + "="*14)
     except Exception as e:
         logging.error(e)
         if settings.DEBUG:
