@@ -1,7 +1,7 @@
 #! /usr/bin/python
 import logging
 from datetime import datetime, timedelta
-from itertools import ifilter
+from itertools import ifilter, groupby
 
 import settings
 from model import User, Task
@@ -10,12 +10,12 @@ from library.mailclient import MailClient, Subjects
 
 
 class Cron(object):
-    def __init__(self, now):
+    def __init__(self, now=datetime.now()):
         self.now = now
         self.template = Template()
         self.mailclient = MailClient()
-        self.failure = "Failed to send email with subject {} to {}."
-        self.success = "Sent email with subject {} to {}.\n"
+        self.failure = 'Failed to send email with subject "{}" to {}.'
+        self.success = 'Sent email with subject "{}" to {}.\n'
 
     def job(self):
         users = User.select().where(User.is_active == True)
@@ -43,11 +43,12 @@ class Cron(object):
         tasks = Task.select()\
             .where((Task.date > last_sent))\
             .order_by(Task.user.name, Task.date)
+
         email_params = {
             'user': user,
             'start': last_sent,
             'end': self.now,
-            'tasks': tasks,
+            'tasks': self.format_tasks(tasks, user),
             'sender': settings.SENDER,
             'timezone_correct': timedelta(hours=user.timezone)
         }
@@ -66,15 +67,29 @@ class Cron(object):
             user.last_reminded = self.now
             user.save()
 
+    def format_tasks(self, all_tasks, recipient):
+        formatted_tasks = []
+        timezone = timedelta(hours=recipient.timezone)
+        usergen = groupby(all_tasks, lambda task: task.user.name)
+        for user, user_tasks in usergen:
+            date_tasks = []
+            dategen = groupby(
+                user_tasks,
+                lambda task: (task.date + timezone).strftime("%B %D, %Y")
+            )
+            for date, tasks in dategen:
+                date_tasks.append({'date': date, 'tasks': [t.description for t in tasks]})
+            formatted_tasks.append({'user': user, 'tasks': date_tasks})
+        return formatted_tasks
+
 
 # Cron for creating digest emails
 if __name__ == '__main__':
     try:
-        now = datetime.now()
-        logging.info("="*14 + " Starting cron " + "="*14)
-        cron = Cron(now)
+        logging.info("{0} Starting cron {0}".format("=" * 14))
+        cron = Cron()
         cron.job()
-        logging.info("="*14 + " Finished cron " + "="*14)
+        logging.info("{0} Finished cron {0}".format("=" * 14))
     except Exception as e:
         logging.error(e)
         if settings.DEBUG:

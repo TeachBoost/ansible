@@ -65,9 +65,9 @@ class User(Model):
         subscription -= timedelta(hours=self.timezone)
         due = date >= subscription and last_sent < subscription
         if not due:
-            logging.info("Skipping {}'s digest".format(self.name))
-            logging.info("    subscription: {}".format(subscription.strftime("%c")))
-            logging.info("    last_sent: {}".format(last_sent.strftime("%c")))
+            logging.debug("Skipping {}'s digest".format(self.name))
+            logging.debug("    subscription: {}".format(subscription.strftime("%c")))
+            logging.debug("    last_sent: {}".format(last_sent.strftime("%c")))
         else:
             logging.info("{} is due".format(self.name))
         return due
@@ -101,11 +101,11 @@ class User(Model):
         ])
 
         if not late:
-            logging.info("Skipping {}'s reminder".format(self.name))
-            logging.info("    deadline: {}".format(deadline.strftime("%c")))
-            logging.info("    last_reminded: {}".format(last_reminded.strftime("%c")))
-            logging.info("    last_reported: {}".format(last_reported.strftime("%c")))
-            logging.info("    send_reminders: {}".format(self.send_reminders))
+            logging.debug("Skipping {}'s reminder".format(self.name))
+            logging.debug("    deadline: {}".format(deadline.strftime("%c")))
+            logging.debug("    last_reminded: {}".format(last_reminded.strftime("%c")))
+            logging.debug("    last_reported: {}".format(last_reported.strftime("%c")))
+            logging.debug("    send_reminders: {}".format(self.send_reminders))
         else:
             logging.info("{} is late".format(self.name))
         return late
