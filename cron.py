@@ -11,7 +11,7 @@ from library.mailclient import MailClient, Subjects
 
 class Cron(object):
     def __init__(self, now=datetime.now()):
-        self.now = now
+        self.now = now + timedelta(hours=(1 if settings.DST else 0))
         self.template = Template()
         self.mailclient = MailClient()
         self.failure = 'Failed to send email with subject "{}" to {}.'

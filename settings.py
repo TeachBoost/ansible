@@ -63,6 +63,10 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(message)s"
 )
 
+# Is it currently daylight savings time
+# TODO: Figure out a better way to do this
+DST = True
+
 TIMEZONES = [
     (-12, "(GMT -12:00) Eniwetok, Kwajalein"),
     (-11, "(GMT -11:00) Midway Island, Samoa"),
