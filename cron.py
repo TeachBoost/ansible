@@ -75,7 +75,7 @@ class Cron(object):
             date_tasks = []
             dategen = groupby(
                 user_tasks,
-                lambda task: (task.date + timezone).strftime("%B %D, %Y")
+                lambda task: (task.date + timezone).strftime("%a %D, %Y")
             )
             for date, tasks in dategen:
                 date_tasks.append({'date': date, 'tasks': [t.description for t in tasks]})
