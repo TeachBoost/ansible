@@ -20,21 +20,23 @@ class Cron(object):
     def job(self):
         users = User.select().where(User.is_active == True)
         for user in ifilter(lambda user: user.is_due(self.now), users):
-            self.send_email(user, self.create_digest, Subjects.DIGEST)
-            self.update_last_sent(user)
-            logging.info("Sent digest to {}".format(user.name))
+            if self.send_email(user, self.create_digest, Subjects.DIGEST):
+                self.update_last_sent(user)
+                logging.info("Sent digest to {}".format(user.name))
         for user in ifilter(lambda user: user.is_late(self.now), users):
-            self.send_email(user, self.create_reminder, Subjects.REMINDER)
-            self.update_last_reminded(user)
-            logging.info("Sent reminder to {}".format(user.name))
+            if self.send_email(user, self.create_reminder, Subjects.REMINDER):
+                self.update_last_reminded(user)
+                logging.info("Sent reminder to {}".format(user.name))
 
     def send_email(self, user, create_email, subject):
         try:
             self.mailclient.send(user, create_email(user), subject)
             if settings.DEBUG:
                 print self.success.format(subject, user.name)
-        except:
+            return True
+        except Exception as e:
             logging.error(self.failure.format(subject, user.name))
+            logging.error(e)
             if settings.DEBUG:
                 raise
 
