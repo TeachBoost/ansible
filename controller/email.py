@@ -140,6 +140,7 @@ def is_not_signature(line):
             '^-- ?\n',
             '-----Original Message-----',
             '________________________________',
+            '^-- Jason DeRoner Co-founder/CEO email:'
             '^On.*wrote:\n',
             '^From: ',
             '^Sent from my iPhone',
