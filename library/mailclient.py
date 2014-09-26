@@ -39,7 +39,7 @@ class MailClient(object):
         email['From'] = settings.SENDER
         email['To'] = recipient.email
         email['Subject'] = subject
-        email.attach(MIMEText(body, 'html'))
+        email.attach(MIMEText(body.encode('UTF-8'), 'html'))
 
         if settings.SEND_EMAIL:
             sender = self.smtp_login()

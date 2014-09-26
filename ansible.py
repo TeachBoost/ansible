@@ -10,7 +10,11 @@ app = application = bottle.Bottle()
 # Base url for regular users
 app.route(settings.BASEPATH, 'GET', admin_controller.index)
 app.route(settings.BASEPATH + '/', 'GET', admin_controller.index)
-app.route(settings.BASEPATH + '/tasks/<id>', 'GET', admin_controller.read_user_tasks)
+app.route(
+    settings.BASEPATH + '/tasks/<id>',
+    'GET',
+    admin_controller.read_user_tasks
+)
 app.route(
     settings.BASEPATH + '/update/<id>',
     'POST',

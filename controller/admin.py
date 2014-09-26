@@ -57,10 +57,13 @@ def read_user_tasks(id, user):
         link="/tasks/{}".format(id)
     )
 
+
 @auth
 @admin_only
 def admin(user):
     ''' Show the admin page '''
+    # This where clause should be (User.is_active is True) to comply
+    # with PEP-8, but peewee doesn't support that syntax.
     users = User.select().where(User.is_active == True).order_by(User.name)
     return template.render(
         'admin.tpl',

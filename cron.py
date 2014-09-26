@@ -18,6 +18,8 @@ class Cron(object):
         self.success = 'Sent email with subject "{}" to {}.\n'
 
     def job(self):
+        # This where clause should be (User.is_active is True) to comply
+        # with PEP-8, but peewee doesn't support that syntax.
         users = User.select().where(User.is_active == True)
         for user in ifilter(lambda user: user.is_due(self.now), users):
             if self.send_email(user, self.create_digest, Subjects.DIGEST):
@@ -80,7 +82,10 @@ class Cron(object):
                 lambda task: (task.date + timezone).strftime("%a %D, %Y")
             )
             for date, tasks in dategen:
-                date_tasks.append({'date': date, 'tasks': [t.description for t in tasks]})
+                date_tasks.append({
+                    'date': date,
+                    'tasks': [t.description for t in tasks]
+                })
             formatted_tasks.append({'user': user, 'tasks': date_tasks})
         return formatted_tasks
 

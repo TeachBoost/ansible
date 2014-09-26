@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timedelta
 from itertools import takewhile, ifilter
-import logging
 
 from bottle import request, HTTPResponse
 
