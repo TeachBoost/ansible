@@ -21,20 +21,23 @@ class Cron(object):
         # This where clause should be (User.is_active is True) to comply
         # with PEP-8, but peewee doesn't support that syntax.
         users = User.select().where(User.is_active == True)
+
+        # Send Email Digests (if necessary)
         for user in ifilter(lambda user: user.is_due(self.now), users):
             if self.send_email(user, self.create_digest, Subjects.DIGEST):
-                self.update_last_sent(user)
-                logging.info("Sent digest to {}".format(user.name))
+                user.update_last_sent(self.now)
+
+        # Send Reminders (if necessary)
         for user in ifilter(lambda user: user.is_late(self.now), users):
             if self.send_email(user, self.create_reminder, Subjects.REMINDER):
-                self.update_last_reminded(user)
-                logging.info("Sent reminder to {}".format(user.name))
+                user.update_last_reminded(self.now)
 
     def send_email(self, user, create_email, subject):
         try:
-            self.mailclient.send(user, create_email(user), subject)
+            email = self.mailclient.send(user, create_email(user), subject)
+            logging.info(self.success.format(subject, user.name))
             if settings.DEBUG:
-                print self.success.format(subject, user.name)
+                print "\n".join(email)
             return True
         except Exception as e:
             logging.error(self.failure.format(subject, user.name))
@@ -45,9 +48,8 @@ class Cron(object):
     def create_digest(self, user):
         last_sent = user.last_sent or user.created
         tasks = Task.select()\
-            .where((Task.date > last_sent))\
+            .where((Task.created > last_sent))\
             .order_by(Task.user.name, Task.date)
-
         email_params = {
             'user': user,
             'start': last_sent,
@@ -60,16 +62,6 @@ class Cron(object):
 
     def create_reminder(self, user):
         return self.template.render('email_reminder.tpl', user=user)
-
-    def update_last_sent(self, user):
-        if not settings.DEBUG:
-            user.last_sent = self.now
-            user.save()
-
-    def update_last_reminded(self, user):
-        if not settings.DEBUG:
-            user.last_reminded = self.now
-            user.save()
 
     def format_tasks(self, all_tasks, recipient):
         formatted_tasks = []
@@ -92,12 +84,14 @@ class Cron(object):
 
 # Cron for creating digest emails
 if __name__ == '__main__':
+    logging.info("{0} Starting cron {0}".format("=" * 14))
+
     try:
-        logging.info("{0} Starting cron {0}".format("=" * 14))
         cron = Cron()
         cron.job()
-        logging.info("{0} Finished cron {0}".format("=" * 14))
     except Exception as e:
         logging.error(e)
         if settings.DEBUG:
             raise
+
+    logging.info("{0} Finished cron {0}".format("=" * 14))

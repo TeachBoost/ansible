@@ -65,7 +65,7 @@ logging.basicConfig(
 
 # Is it currently daylight savings time
 # TODO: Figure out a better way to do this
-DST = True
+DST = False
 
 TIMEZONES = [
     (-12, "(GMT -12:00) Eniwetok, Kwajalein"),

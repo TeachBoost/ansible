@@ -124,9 +124,21 @@ class User(Model):
         '''
         Updates the last_sent property of a user
         time = the time to save as last_sent
+        No update will be made in debug mode
         '''
-        self.last_sent = time
-        self.save()
+        if not settings.DEBUG:
+            self.last_sent = time
+            self.save()
+
+    def update_last_reminded(self, time):
+        '''
+        Updates the last_reminded property of a user
+        time = the time to save as last_reminded
+        No update will be made in debug mode
+        '''
+        if not settings.DEBUG:
+            user.last_reminded = self.now
+            user.save()
 
     def update_schedule(self, schedule):
         '''
@@ -155,3 +167,4 @@ class Task(Model):
     user = ForeignKeyField(User)
     date = DateTimeField(default=datetime.now)
     description = TextField()
+    created = DateTimeField(default=datetime.now)
