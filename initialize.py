@@ -105,8 +105,8 @@ if __name__ == "__main__":
     exists = os.path.isfile(settings.DATABASE)
 
     if exists and not (delete or table):
-        print ''''A database already exists.
+        print(''''A database already exists.
         Run with -d to delete existing database
-        Run with -t <tablename> to rebuild a single table'''
+        Run with -t <tablename> to rebuild a single table''')
     else:
         initialize(exists and delete, table)

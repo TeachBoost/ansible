@@ -1,6 +1,7 @@
 import re
 from datetime import datetime, timedelta
-from itertools import takewhile, ifilter
+from itertools import takewhile
+from functools import reduce
 
 from bottle import request, HTTPResponse
 
@@ -151,4 +152,4 @@ def is_not_signature(line):
 
 def parse_body(body):
     lines = re.sub('\n(?!\n)', ' ', re.sub('\r', '', body)).split('\n')
-    return ifilter(None, takewhile(is_not_signature, map(str.strip, lines)))
+    return filter(None, takewhile(is_not_signature, map(str.strip, lines)))

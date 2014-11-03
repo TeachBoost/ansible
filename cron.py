@@ -1,7 +1,7 @@
 #! /usr/bin/python
 import logging
 from datetime import datetime, timedelta
-from itertools import ifilter, groupby
+from itertools import groupby
 
 import settings
 from model import User, Task
@@ -23,12 +23,12 @@ class Cron(object):
         users = User.select().where(User.is_active == True)
 
         # Send Email Digests (if necessary)
-        for user in ifilter(lambda user: user.is_due(self.now), users):
+        for user in filter(lambda user: user.is_due(self.now), users):
             if self.send_email(user, self.create_digest, Subjects.DIGEST):
                 user.update_last_sent(self.now)
 
         # Send Reminders (if necessary)
-        for user in ifilter(lambda user: user.is_late(self.now), users):
+        for user in filter(lambda user: user.is_late(self.now), users):
             if self.send_email(user, self.create_reminder, Subjects.REMINDER):
                 user.update_last_reminded(self.now)
 
@@ -37,7 +37,7 @@ class Cron(object):
             email = self.mailclient.send(user, create_email(user), subject)
             logging.info(self.success.format(subject, user.name))
             if settings.DEBUG:
-                print "\n".join(email)
+                print("\n".join(email))
             return True
         except Exception as e:
             logging.error(self.failure.format(subject, user.name))
